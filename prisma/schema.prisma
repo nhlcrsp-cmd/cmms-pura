@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Rol {
+  id          Int        @id @default(autoincrement())
+  nombre      String     @unique
+  descripcion String?
+  usuarios    Usuario[]
+}
+
+model Usuario {
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  apellido   String
+  usuario    String   @unique
+  email      String?  @unique
+  password   String
+  activo     Boolean  @default(true)
+  creadoEn   DateTime @default(now())
+
+  rolId      Int
+  rol        Rol      @relation(fields: [rolId], references: [id])
+
+  ordenes    OrdenTrabajo[]
+}
+
+model Ubicacion {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+
+  activos     Activo[]
+}
+
+model Activo {
+  id             Int      @id @default(autoincrement())
+  codigo         String   @unique
+  nombre         String
+  fabricante     String?
+  modelo         String?
+  numeroSerie    String?
+  criticidad     String
+  estado         String
+  fechaAlta      DateTime @default(now())
+
+  ubicacionId    Int
+  ubicacion      Ubicacion @relation(fields: [ubicacionId], references: [id])
+
+  padreId        Int?
+  padre          Activo?   @relation("Jerarquia", fields: [padreId], references: [id])
+  hijos          Activo[]  @relation("Jerarquia")
+
+  ordenes        OrdenTrabajo[]
+}
+
+model OrdenTrabajo {
+  id            Int      @id @default(autoincrement())
+  numero        String   @unique
+  titulo        String
+  descripcion   String
+  prioridad     String
+  estado        String
+  fechaCreacion DateTime @default(now())
+
+  activoId       Int
+  activo         Activo   @relation(fields: [activoId], references: [id])
+
+  responsableId  Int
+  responsable    Usuario  @relation(fields: [responsableId], references: [id])
+}

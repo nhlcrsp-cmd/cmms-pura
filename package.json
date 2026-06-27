@@ -1,0 +1,22 @@
+{
+  "name": "cmms-pura",
+  "version": "0.1.0",
+  "description": "CMMS Pura - Sistema de Gestión de Mantenimiento",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
+  },
+  "author": "Nahuel Crespo",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "prisma": "^6.19.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
