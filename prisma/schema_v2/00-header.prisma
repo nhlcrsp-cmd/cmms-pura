@@ -1,0 +1,28 @@
+// ======================================================
+// CMMS PURA
+// Schema v2.0
+// ======================================================
+//
+// Arquitectura:
+//
+// Organización
+// Seguridad
+// Catálogo Técnico
+// Activos
+// Documentación
+// Personalización
+// Eventos
+// Mantenimiento
+// Inventario
+// Analítica
+//
+// ======================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}

@@ -7,70 +7,295 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//////////////////////////////////////////////////////
+// SEGURIDAD
+//////////////////////////////////////////////////////
+
 model Rol {
-  id          Int        @id @default(autoincrement())
-  nombre      String     @unique
+  id          Int       @id @default(autoincrement())
+  uuid        String    @unique @default(uuid())
+
+  nombre      String    @unique
   descripcion String?
+
+  activo      Boolean   @default(true)
+
+  creadoEn    DateTime  @default(now())
+  actualizadoEn DateTime @updatedAt
+
   usuarios    Usuario[]
 }
 
 model Usuario {
-  id         Int      @id @default(autoincrement())
-  nombre     String
-  apellido   String
-  usuario    String   @unique
-  email      String?  @unique
-  password   String
-  activo     Boolean  @default(true)
-  creadoEn   DateTime @default(now())
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
 
-  rolId      Int
-  rol        Rol      @relation(fields: [rolId], references: [id])
+  nombre        String
+  apellido      String
 
-  ordenes    OrdenTrabajo[]
-}
+  usuario       String    @unique
+  email         String?   @unique
+  password      String
 
-model Ubicacion {
-  id          Int      @id @default(autoincrement())
-  nombre      String
-  descripcion String?
+  activo        Boolean   @default(true)
 
-  activos     Activo[]
-}
+  ultimoAcceso  DateTime?
 
-model Activo {
-  id             Int      @id @default(autoincrement())
-  codigo         String   @unique
-  nombre         String
-  fabricante     String?
-  modelo         String?
-  numeroSerie    String?
-  criticidad     String
-  estado         String
-  fechaAlta      DateTime @default(now())
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
 
-  ubicacionId    Int
-  ubicacion      Ubicacion @relation(fields: [ubicacionId], references: [id])
-
-  padreId        Int?
-  padre          Activo?   @relation("Jerarquia", fields: [padreId], references: [id])
-  hijos          Activo[]  @relation("Jerarquia")
+  rolId         Int
+  rol           Rol       @relation(fields: [rolId], references: [id])
 
   ordenes        OrdenTrabajo[]
 }
 
-model OrdenTrabajo {
+//////////////////////////////////////////////////////
+// INFRAESTRUCTURA
+//////////////////////////////////////////////////////
+
+model Planta {
+
   id            Int      @id @default(autoincrement())
-  numero        String   @unique
-  titulo        String
-  descripcion   String
-  prioridad     String
-  estado        String
-  fechaCreacion DateTime @default(now())
+  uuid          String   @unique @default(uuid())
 
-  activoId       Int
-  activo         Activo   @relation(fields: [activoId], references: [id])
+  codigo        String   @unique
+  nombre        String
 
-  responsableId  Int
-  responsable    Usuario  @relation(fields: [responsableId], references: [id])
+  descripcion   String?
+
+  activo        Boolean  @default(true)
+
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  ubicaciones   Ubicacion[]
+}
+
+model Ubicacion {
+
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+
+  codigo        String   @unique
+  nombre        String
+
+  descripcion   String?
+
+  activo        Boolean  @default(true)
+
+  plantaId      Int
+  planta        Planta   @relation(fields:[plantaId], references:[id])
+
+  padreId       Int?
+
+  padre         Ubicacion? @relation("JerarquiaUbicacion", fields:[padreId], references:[id])
+
+  hijos         Ubicacion[] @relation("JerarquiaUbicacion")
+
+  activos       Activo[]
+
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// CATALOGOS
+//////////////////////////////////////////////////////
+
+model TipoActivo {
+
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+
+  nombre        String   @unique
+  descripcion   String?
+
+  icono         String?
+
+  activo        Boolean  @default(true)
+
+  modelos       ModeloActivo[]
+}
+
+model EstadoActivo {
+
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+
+  nombre        String   @unique
+
+  activo        Boolean  @default(true)
+
+  activos       Activo[]
+}
+
+model Criticidad {
+
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+
+  nombre        String   @unique
+
+  nivel         Int
+
+  color         String?
+
+  activos       Activo[]
+}
+
+model Fabricante {
+
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+
+  nombre        String   @unique
+
+  pais          String?
+
+  sitioWeb      String?
+
+  contacto      String?
+
+  modelos       ModeloActivo[]
+}
+
+model ModeloActivo {
+
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+
+  codigo        String   @unique
+
+  nombre        String
+
+  descripcion   String?
+
+  fabricanteId  Int
+  fabricante    Fabricante @relation(fields:[fabricanteId], references:[id])
+
+  tipoActivoId  Int
+  tipoActivo    TipoActivo @relation(fields:[tipoActivoId], references:[id])
+
+  activos       Activo[]
+}
+
+//////////////////////////////////////////////////////
+// ACTIVOS
+//////////////////////////////////////////////////////
+
+model Activo {
+
+  id                Int      @id @default(autoincrement())
+  uuid              String   @unique @default(uuid())
+
+  codigoInterno     String   @unique
+
+  codigoQR          String   @unique
+
+  nombre            String
+
+  descripcion       String?
+
+  numeroSerie       String?
+
+  fechaAlta         DateTime @default(now())
+
+  fechaInstalacion  DateTime?
+
+  fechaBaja         DateTime?
+
+  activo            Boolean  @default(true)
+
+  modeloActivoId    Int
+  modeloActivo      ModeloActivo @relation(fields:[modeloActivoId], references:[id])
+
+  ubicacionId       Int
+  ubicacion         Ubicacion @relation(fields:[ubicacionId], references:[id])
+
+  estadoActivoId    Int
+  estadoActivo      EstadoActivo @relation(fields:[estadoActivoId], references:[id])
+
+  criticidadId      Int
+  criticidad        Criticidad @relation(fields:[criticidadId], references:[id])
+
+  padreId           Int?
+
+  padre             Activo? @relation("JerarquiaActivo", fields:[padreId], references:[id])
+
+  hijos             Activo[] @relation("JerarquiaActivo")
+
+  ordenes           OrdenTrabajo[]
+
+  creadoEn          DateTime @default(now())
+  actualizadoEn     DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// CAMPOS PERSONALIZADOS
+//////////////////////////////////////////////////////
+
+model CampoPersonalizado {
+
+  id            Int      @id @default(autoincrement())
+
+  nombre        String
+
+  tipoDato      String
+
+  unidad        String?
+
+  obligatorio   Boolean @default(false)
+
+  orden         Int @default(0)
+
+  tipoActivoId  Int
+
+  tipoActivo    TipoActivo @relation(fields:[tipoActivoId], references:[id])
+
+  valores       ValorCampo[]
+}
+
+model ValorCampo {
+
+  id            Int @id @default(autoincrement())
+
+  valor         String
+
+  activoId      Int
+
+  activo        Activo @relation(fields:[activoId], references:[id])
+
+  campoId       Int
+
+  campo         CampoPersonalizado @relation(fields:[campoId], references:[id])
+}
+
+//////////////////////////////////////////////////////
+// ORDENES
+//////////////////////////////////////////////////////
+
+model OrdenTrabajo {
+
+  id              Int      @id @default(autoincrement())
+
+  numero          String   @unique
+
+  titulo          String
+
+  descripcion     String
+
+  prioridad       String
+
+  estado          String
+
+  fechaCreacion   DateTime @default(now())
+
+  activoId        Int
+
+  activo          Activo @relation(fields:[activoId], references:[id])
+
+  responsableId   Int
+
+  responsable     Usuario @relation(fields:[responsableId], references:[id])
 }

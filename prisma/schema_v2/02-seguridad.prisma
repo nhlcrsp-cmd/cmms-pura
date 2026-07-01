@@ -1,0 +1,851 @@
+// ======================================================
+// BLOQUE B1
+// USUARIO
+// ======================================================
+
+model Usuario {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id             Int       @id @default(autoincrement())
+  uuid           String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Organización
+  // ----------------------------------------------------
+
+  departamentoId Int
+
+  // ----------------------------------------------------
+  // Credenciales
+  // ----------------------------------------------------
+
+  usuario        String    @unique
+  email          String?   @unique
+
+  passwordHash   String
+
+  // ----------------------------------------------------
+  // Información personal
+  // ----------------------------------------------------
+
+  nombre         String
+  apellido       String
+
+  telefono       String?
+
+  legajo         String?
+
+  observaciones  String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo         Boolean   @default(true)
+
+  ultimoLoginEn  DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn       DateTime  @default(now())
+  actualizadoEn  DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  departamento   Departamento @relation(fields: [departamentoId], references: [id])
+
+  roles          UsuarioRol[]
+
+  rolesAsignados UsuarioRol[] @relation("UsuarioRolAsignadoPor")
+
+  permisosAsignados RolPermiso[] @relation("RolPermisoAsignadoPor")
+
+  sesiones       Sesion[]
+
+  horasTrabajo   HoraTrabajo[]
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([departamentoId])
+
+  @@index([apellido, nombre])
+
+  @@index([activo])
+}
+// ======================================================
+// BLOQUE B2
+// ROL
+// ======================================================
+
+model Rol {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id             Int       @id @default(autoincrement())
+  uuid           String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo         String    @unique
+
+  nombre         String
+
+  descripcion    String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  color          String?
+
+  icono          String?
+
+  orden          Int       @default(0)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo         Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn       DateTime  @default(now())
+
+  actualizadoEn  DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  usuarios       UsuarioRol[]
+
+  permisos       RolPermiso[]
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([nombre])
+
+  @@index([activo])
+
+}
+// ======================================================
+// BLOQUE B3
+// DOMINIO DEL SISTEMA
+// ======================================================
+
+model DominioSistema {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id             Int       @id @default(autoincrement())
+  uuid           String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo         String    @unique
+
+  nombre         String
+
+  descripcion    String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  icono          String?
+
+  orden          Int       @default(0)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo         Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn       DateTime  @default(now())
+
+  actualizadoEn  DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  recursos       RecursoSistema[]
+
+  permisos       Permiso[]
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([nombre])
+
+  @@index([activo])
+
+}
+// ======================================================
+// BLOQUE B4
+// RECURSO DEL SISTEMA
+// ======================================================
+
+model RecursoSistema {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id             Int       @id @default(autoincrement())
+  uuid           String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  dominioSistemaId Int
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo         String
+
+  nombre         String
+
+  descripcion    String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  icono          String?
+
+  color          String?
+
+  orden          Int       @default(0)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo         Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn       DateTime  @default(now())
+
+  actualizadoEn  DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  dominioSistema DominioSistema @relation(
+    fields: [dominioSistemaId],
+    references: [id]
+  )
+
+  permisos       Permiso[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([dominioSistemaId, codigo])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([dominioSistemaId])
+
+  @@index([nombre])
+
+  @@index([activo])
+
+}
+// ======================================================
+// BLOQUE B5
+// ACCIÓN DEL SISTEMA
+// ======================================================
+
+model AccionSistema {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id             Int       @id @default(autoincrement())
+  uuid           String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo         String    @unique
+
+  nombre         String
+
+  descripcion    String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  icono          String?
+
+  color          String?
+
+  orden          Int       @default(0)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo         Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn       DateTime  @default(now())
+
+  actualizadoEn  DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  permisos       Permiso[]
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([nombre])
+
+  @@index([activo])
+
+}
+// ======================================================
+// BLOQUE B6
+// ALCANCE DEL PERMISO
+// ======================================================
+
+model AlcancePermiso {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id             Int       @id @default(autoincrement())
+  uuid           String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo         String    @unique
+
+  nombre         String
+
+  descripcion    String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  icono          String?
+
+  color          String?
+
+  orden          Int       @default(0)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo         Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn       DateTime  @default(now())
+
+  actualizadoEn  DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  permisos       Permiso[]
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([nombre])
+
+  @@index([activo])
+
+}
+// ======================================================
+// BLOQUE B7
+// PERMISO
+// ======================================================
+
+model Permiso {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                 Int      @id @default(autoincrement())
+  uuid               String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  recursoSistemaId   Int
+  accionSistemaId    Int
+  alcancePermisoId   Int
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  descripcion        String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo             Boolean  @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn           DateTime @default(now())
+  actualizadoEn      DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  recursoSistema     RecursoSistema  @relation(
+    fields: [recursoSistemaId],
+    references: [id]
+  )
+
+  accionSistema      AccionSistema   @relation(
+    fields: [accionSistemaId],
+    references: [id]
+  )
+
+  alcancePermiso     AlcancePermiso  @relation(
+    fields: [alcancePermisoId],
+    references: [id]
+  )
+
+  roles              RolPermiso[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([
+    recursoSistemaId,
+    accionSistemaId,
+    alcancePermisoId
+  ])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([recursoSistemaId])
+
+  @@index([accionSistemaId])
+
+  @@index([alcancePermisoId])
+
+  @@index([activo])
+
+}
+// ======================================================
+// BLOQUE B8
+// USUARIO ROL
+// ======================================================
+
+model UsuarioRol {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  Int       @id @default(autoincrement())
+  uuid                String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  usuarioId           Int
+  rolId               Int
+
+  asignadoPorUsuarioId Int?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  principal           Boolean   @default(false)
+
+  fechaDesde          DateTime  @default(now())
+
+  fechaHasta          DateTime?
+
+  observaciones       String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime  @default(now())
+
+  actualizadoEn       DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  usuario             Usuario   @relation(
+    fields: [usuarioId],
+    references: [id]
+  )
+
+  rol                 Rol       @relation(
+    fields: [rolId],
+    references: [id]
+  )
+
+  asignadoPor         Usuario?  @relation(
+    "UsuarioRolAsignadoPor",
+    fields: [asignadoPorUsuarioId],
+    references: [id]
+  )
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([usuarioId, rolId])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([usuarioId])
+
+  @@index([rolId])
+
+  @@index([asignadoPorUsuarioId])
+
+  @@index([principal])
+
+  @@index([activo])
+
+  @@index([fechaDesde])
+
+  @@index([fechaHasta])
+
+}
+// ======================================================
+// BLOQUE B9
+// ROL PERMISO
+// ======================================================
+
+model RolPermiso {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  Int       @id @default(autoincrement())
+  uuid                String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  rolId               Int
+
+  permisoId           Int
+
+  asignadoPorUsuarioId Int?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  fechaDesde          DateTime  @default(now())
+
+  fechaHasta          DateTime?
+
+  observaciones       String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime  @default(now())
+
+  actualizadoEn       DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  rol                 Rol       @relation(
+    fields: [rolId],
+    references: [id]
+  )
+
+  permiso             Permiso   @relation(
+    fields: [permisoId],
+    references: [id]
+  )
+
+  asignadoPor         Usuario?  @relation(
+    "RolPermisoAsignadoPor",
+    fields: [asignadoPorUsuarioId],
+    references: [id]
+  )
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([rolId, permisoId])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([rolId])
+
+  @@index([permisoId])
+
+  @@index([asignadoPorUsuarioId])
+
+  @@index([activo])
+
+  @@index([fechaDesde])
+
+  @@index([fechaHasta])
+
+}
+// ======================================================
+// BLOQUE B10
+// SESIÓN
+// ======================================================
+
+model Sesion {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                Int       @id @default(autoincrement())
+  uuid              String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  usuarioId         Int
+
+  // ----------------------------------------------------
+  // Información de autenticación
+  // ----------------------------------------------------
+
+  tokenId           String    @unique
+
+  // ----------------------------------------------------
+  // Información del dispositivo
+  // ----------------------------------------------------
+
+  nombreDispositivo String?
+
+  sistemaOperativo  String?
+
+  navegador         String?
+
+  direccionIp       String?
+
+  userAgent         String?
+
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
+
+  inicioSesionEn    DateTime  @default(now())
+
+  ultimoAccesoEn    DateTime  @default(now())
+
+  expiraEn          DateTime
+
+  cerradoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activa            Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn          DateTime  @default(now())
+
+  actualizadoEn     DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  usuario           Usuario    @relation(
+    fields: [usuarioId],
+    references: [id]
+  )
+
+  refreshTokens     RefreshToken[]
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([usuarioId])
+
+  @@index([activa])
+
+  @@index([expiraEn])
+
+  @@index([ultimoAccesoEn])
+
+}
+// ======================================================
+// BLOQUE B11
+// REFRESH TOKEN
+// ======================================================
+
+model RefreshToken {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                Int       @id @default(autoincrement())
+  uuid              String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  sesionId          Int
+
+  // ----------------------------------------------------
+  // Información del token
+  // ----------------------------------------------------
+
+  tokenHash         String    @unique
+
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
+
+  emitidoEn         DateTime  @default(now())
+
+  expiraEn          DateTime
+
+  utilizadoEn       DateTime?
+
+  revocadoEn        DateTime?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo            Boolean   @default(true)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn          DateTime  @default(now())
+
+  actualizadoEn     DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  sesion            Sesion    @relation(
+    fields: [sesionId],
+    references: [id],
+    onDelete: Cascade
+  )
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([sesionId])
+
+  @@index([activo])
+
+  @@index([expiraEn])
+
+}

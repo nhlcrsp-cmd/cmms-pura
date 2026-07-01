@@ -1,0 +1,409 @@
+// =======================================================
+// CMMS PURA
+// Schema v2.0
+// Arquitectura basada en Dominios
+// =======================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+// =======================================================
+// BLOQUE 1
+// ORGANIZACIÓN
+// =======================================================
+
+model Empresa {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  plantas       Planta[]
+
+  @@index([nombre])
+}
+
+model Planta {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  empresaId     Int
+
+  codigo        String
+  nombre        String
+  descripcion   String?
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  empresa        Empresa      @relation(fields: [empresaId], references: [id])
+
+  areas          Area[]
+  ubicaciones    Ubicacion[]
+  sistemas       Sistema[]
+  fabricantes    Fabricante[]
+  modelos        Modelo[]
+  activos        Activo[]
+
+  @@unique([empresaId, codigo])
+
+  @@index([empresaId])
+  @@index([nombre])
+}
+
+model Area {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  plantaId      Int
+
+  codigo        String
+  nombre        String
+  descripcion   String?
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  planta        Planta      @relation(fields: [plantaId], references: [id])
+
+  ubicaciones   Ubicacion[]
+
+  @@unique([plantaId, codigo])
+
+  @@index([plantaId])
+}
+
+model Ubicacion {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  plantaId      Int
+  areaId        Int?
+
+  padreId       Int?
+
+  codigo        String
+  nombre        String
+  descripcion   String?
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  planta        Planta      @relation(fields: [plantaId], references: [id])
+
+  area          Area?       @relation(fields: [areaId], references: [id])
+
+  padre         Ubicacion?  @relation("JerarquiaUbicacion", fields: [padreId], references: [id])
+
+  hijos         Ubicacion[] @relation("JerarquiaUbicacion")
+
+  activos       Activo[]
+
+  @@unique([plantaId, codigo])
+
+  @@index([plantaId])
+  @@index([areaId])
+  @@index([padreId])
+}
+// =======================================================
+// BLOQUE 2
+// SEGURIDAD
+// =======================================================
+
+model Usuario {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  rolId         Int
+
+  usuario       String    @unique
+  email         String?   @unique
+
+  passwordHash  String
+
+  nombre        String
+  apellido      String
+
+  telefono      String?
+
+  activo        Boolean   @default(true)
+
+  ultimoLoginEn DateTime?
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  rol           Rol       @relation(fields: [rolId], references: [id])
+
+  horasTrabajo  HoraTrabajo[]
+
+  @@index([rolId])
+  @@index([apellido])
+}
+
+model Rol {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  usuarios      Usuario[]
+
+  permisos      RolPermiso[]
+}
+
+model Permiso {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+
+  nombre        String
+
+  descripcion   String?
+
+  modulo        String
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  roles         RolPermiso[]
+
+  @@index([modulo])
+}
+
+model RolPermiso {
+  rolId         Int
+
+  permisoId     Int
+
+  permitido     Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+
+  rol           Rol       @relation(fields: [rolId], references: [id])
+
+  permiso       Permiso   @relation(fields: [permisoId], references: [id])
+
+  @@id([rolId, permisoId])
+
+  @@index([permisoId])
+}
+// =======================================================
+// BLOQUE 3
+// CATÁLOGOS
+// =======================================================
+
+model ClaseActivo {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  tipos         TipoActivo[]
+
+  @@index([nombre])
+}
+
+model TipoActivo {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  claseActivoId Int
+
+  padreId       Int?
+
+  codigo        String
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  claseActivo   ClaseActivo @relation(fields: [claseActivoId], references: [id])
+
+  padre         TipoActivo? @relation("JerarquiaTipoActivo", fields: [padreId], references: [id])
+
+  hijos         TipoActivo[] @relation("JerarquiaTipoActivo")
+
+  ativos        Activo[]
+
+  @@unique([claseActivoId, codigo])
+
+  @@index([padreId])
+}
+
+model TipoUbicacion {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+}
+
+model EstadoActivo {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  activos       Activo[]
+}
+
+model Criticidad {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  activos       Activo[]
+}
+
+model Prioridad {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+}
+
+model TipoDocumento {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+}
+
+model TipoEvento {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+}
+
+model TipoRelacionActivo {
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+
+  codigo        String    @unique
+  nombre        String
+  descripcion   String?
+
+  color         String?
+  icono         String?
+  orden         Int       @default(0)
+
+  activo        Boolean   @default(true)
+
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  relaciones    RelacionActivo[]
+}

@@ -1,0 +1,78 @@
+// ======================================================
+// DOMINIO 01 - ORGANIZACIÓN
+// Release 2.1
+// ======================================================
+
+model Empresa {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                    BigInt    @id @default(autoincrement())
+
+  uuid                  String    @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo                String    @unique
+
+  razonSocial           String
+
+  nombreComercial       String?
+
+  identificacionFiscal  String?
+
+  descripcion           String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre           String?
+
+  colorHex              String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo                Boolean   @default(true)
+
+  eliminadoEn           DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn              DateTime  @default(now())
+
+  actualizadoEn         DateTime  @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  unidadesOrganizacionales UnidadOrganizacional[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([razonSocial])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([razonSocial])
+
+  @@index([activo])
+
+  @@map("empresas")
+
+}
