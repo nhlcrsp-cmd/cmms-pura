@@ -1,78 +1,94 @@
-// ======================================================
-// DOMINIO 01 - ORGANIZACIÓN
-// Release 2.1
-// ======================================================
+// ====================================================== // DOMINIO
+01 - ORGANIZACIÓN // Release 2.1 (BORRADOR ARQUITECTÓNICO) //
+======================================================
 
 model Empresa {
 
-  // ----------------------------------------------------
-  // Identidad
-  // ----------------------------------------------------
+id BigInt @id @default(autoincrement()) uuid String @unique
+@default(uuid())
 
-  id                    BigInt    @id @default(autoincrement())
+codigo String @unique razonSocial String nombreComercial String?
+identificacionFiscal String? descripcion String?
 
-  uuid                  String    @unique @default(uuid())
+iconoNombre String? colorHex String?
 
-  // ----------------------------------------------------
-  // Información
-  // ----------------------------------------------------
+activo Boolean @default(true) eliminadoEn DateTime?
 
-  codigo                String    @unique
+creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
 
-  razonSocial           String
+unidadesOrganizacionales UnidadOrganizacional[]
 
-  nombreComercial       String?
+@@unique([razonSocial]) @@index([codigo]) @@index([razonSocial])
+@@map(“empresas”) }
 
-  identificacionFiscal  String?
+model TipoUnidadOrganizacional {
 
-  descripcion           String?
+id BigInt @id @default(autoincrement()) uuid String @unique
+@default(uuid())
 
-  // ----------------------------------------------------
-  // Presentación
-  // ----------------------------------------------------
+codigo String @unique nombre String descripcion String?
 
-  iconoNombre           String?
+iconoNombre String? colorHex String? ordenVisual Int?
 
-  colorHex              String?
+permitePadre Boolean @default(true) permiteHijos Boolean @default(true)
+admiteActivos Boolean @default(true) admitePersonas Boolean
+@default(true) admiteInventario Boolean @default(true)
+admiteOrdenesTrabajo Boolean @default(true)
 
-  // ----------------------------------------------------
-  // Estado
-  // ----------------------------------------------------
+activo Boolean @default(true) eliminadoEn DateTime?
 
-  activo                Boolean   @default(true)
+creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
 
-  eliminadoEn           DateTime?
+unidadesOrganizacionales UnidadOrganizacional[]
 
-  // ----------------------------------------------------
-  // Auditoría
-  // ----------------------------------------------------
+@@unique([nombre]) @@map(“tipos_unidad_organizacional”) }
 
-  creadoEn              DateTime  @default(now())
+model UnidadOrganizacional {
 
-  actualizadoEn         DateTime  @updatedAt
+id BigInt @id @default(autoincrement()) uuid String @unique
+@default(uuid())
 
-  // ----------------------------------------------------
-  // Relaciones
-  // ----------------------------------------------------
+empresaId BigInt tipoUnidadOrganizacionalId BigInt padreId BigInt?
 
-  unidadesOrganizacionales UnidadOrganizacional[]
+codigo String nombre String descripcion String?
 
-  // ----------------------------------------------------
-  // Restricciones
-  // ----------------------------------------------------
+iconoNombre String? colorHex String? ordenVisual Int?
 
-  @@unique([razonSocial])
+activo Boolean @default(true) eliminadoEn DateTime?
 
-  // ----------------------------------------------------
-  // Índices
-  // ----------------------------------------------------
+creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
 
-  @@index([codigo])
+empresa Empresa @relation(fields: [empresaId], references: [id],
+onDelete: Restrict) tipo TipoUnidadOrganizacional @relation(fields:
+[tipoUnidadOrganizacionalId], references: [id], onDelete: Restrict)
 
-  @@index([razonSocial])
+padre UnidadOrganizacional? @relation(“UnidadPadre”, fields: [padreId],
+references: [id], onDelete: Restrict) hijos UnidadOrganizacional[]
+@relation(“UnidadPadre”)
 
-  @@index([activo])
+closureComoAncestro UnidadOrganizacionalClosure[]
+@relation(“ClosureAncestro”) closureComoDescendiente
+UnidadOrganizacionalClosure[] @relation(“ClosureDescendiente”)
 
-  @@map("empresas")
+@@unique([empresaId, codigo]) @@unique([empresaId, padreId, nombre])
 
-}
+@@index([empresaId]) @@index([tipoUnidadOrganizacionalId])
+@@index([padreId])
+
+@@map(“unidades_organizacionales”) }
+
+model UnidadOrganizacionalClosure {
+
+ancestroId BigInt descendienteId BigInt profundidad Int
+
+ancestro UnidadOrganizacional @relation(“ClosureAncestro”, fields:
+[ancestroId], references: [id], onDelete: Cascade) descendiente
+UnidadOrganizacional @relation(“ClosureDescendiente”, fields:
+[descendienteId], references: [id], onDelete: Cascade)
+
+@@id([ancestroId, descendienteId])
+
+@@index([ancestroId]) @@index([descendienteId]) @@index([ancestroId,
+profundidad]) @@index([descendienteId, profundidad])
+
+@@map(“unidades_organizacionales_closure”) }

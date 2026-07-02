@@ -12,42 +12,42 @@ datasource db {
 //////////////////////////////////////////////////////
 
 model Rol {
-  id          Int       @id @default(autoincrement())
-  uuid        String    @unique @default(uuid())
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  nombre      String    @unique
+  nombre      String  @unique
   descripcion String?
 
-  activo      Boolean   @default(true)
+  activo Boolean @default(true)
 
-  creadoEn    DateTime  @default(now())
+  creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
 
-  usuarios    Usuario[]
+  usuarios Usuario[]
 }
 
 model Usuario {
-  id            Int       @id @default(autoincrement())
-  uuid          String    @unique @default(uuid())
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  nombre        String
-  apellido      String
+  nombre   String
+  apellido String
 
-  usuario       String    @unique
-  email         String?   @unique
-  password      String
+  usuario  String  @unique
+  email    String? @unique
+  password String
 
-  activo        Boolean   @default(true)
+  activo Boolean @default(true)
 
-  ultimoAcceso  DateTime?
+  ultimoAcceso DateTime?
 
-  creadoEn      DateTime  @default(now())
-  actualizadoEn DateTime  @updatedAt
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
 
-  rolId         Int
-  rol           Rol       @relation(fields: [rolId], references: [id])
+  rolId Int
+  rol   Rol @relation(fields: [rolId], references: [id])
 
-  ordenes        OrdenTrabajo[]
+  ordenes OrdenTrabajo[]
 }
 
 //////////////////////////////////////////////////////
@@ -55,45 +55,43 @@ model Usuario {
 //////////////////////////////////////////////////////
 
 model Planta {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
+  codigo String @unique
+  nombre String
 
-  codigo        String   @unique
-  nombre        String
+  descripcion String?
 
-  descripcion   String?
-
-  activo        Boolean  @default(true)
+  activo Boolean @default(true)
 
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
 
-  ubicaciones   Ubicacion[]
+  ubicaciones Ubicacion[]
 }
 
 model Ubicacion {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
+  codigo String @unique
+  nombre String
 
-  codigo        String   @unique
-  nombre        String
+  descripcion String?
 
-  descripcion   String?
+  activo Boolean @default(true)
 
-  activo        Boolean  @default(true)
+  plantaId Int
+  planta   Planta @relation(fields: [plantaId], references: [id])
 
-  plantaId      Int
-  planta        Planta   @relation(fields:[plantaId], references:[id])
+  padreId Int?
 
-  padreId       Int?
+  padre Ubicacion? @relation("JerarquiaUbicacion", fields: [padreId], references: [id])
 
-  padre         Ubicacion? @relation("JerarquiaUbicacion", fields:[padreId], references:[id])
+  hijos Ubicacion[] @relation("JerarquiaUbicacion")
 
-  hijos         Ubicacion[] @relation("JerarquiaUbicacion")
-
-  activos       Activo[]
+  activos Activo[]
 
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
@@ -104,80 +102,76 @@ model Ubicacion {
 //////////////////////////////////////////////////////
 
 model TipoActivo {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
+  nombre      String  @unique
+  descripcion String?
 
-  nombre        String   @unique
-  descripcion   String?
+  icono String?
 
-  icono         String?
+  activo Boolean @default(true)
 
-  activo        Boolean  @default(true)
-
-  modelos       ModeloActivo[]
+  modelos             ModeloActivo[]
+  campoPersonalizados CampoPersonalizado[]
 }
 
 model EstadoActivo {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
+  nombre String @unique
 
-  nombre        String   @unique
+  activo Boolean @default(true)
 
-  activo        Boolean  @default(true)
-
-  activos       Activo[]
+  activos Activo[]
 }
 
 model Criticidad {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
+  nombre String @unique
 
-  nombre        String   @unique
+  nivel Int
 
-  nivel         Int
+  color String?
 
-  color         String?
-
-  activos       Activo[]
+  activos Activo[]
 }
 
 model Fabricante {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
+  nombre String @unique
 
-  nombre        String   @unique
+  pais String?
 
-  pais          String?
+  sitioWeb String?
 
-  sitioWeb      String?
+  contacto String?
 
-  contacto      String?
-
-  modelos       ModeloActivo[]
+  modelos ModeloActivo[]
 }
 
 model ModeloActivo {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id            Int      @id @default(autoincrement())
-  uuid          String   @unique @default(uuid())
+  codigo String @unique
 
-  codigo        String   @unique
+  nombre String
 
-  nombre        String
+  descripcion String?
 
-  descripcion   String?
+  fabricanteId Int
+  fabricante   Fabricante @relation(fields: [fabricanteId], references: [id])
 
-  fabricanteId  Int
-  fabricante    Fabricante @relation(fields:[fabricanteId], references:[id])
+  tipoActivoId Int
+  tipoActivo   TipoActivo @relation(fields: [tipoActivoId], references: [id])
 
-  tipoActivoId  Int
-  tipoActivo    TipoActivo @relation(fields:[tipoActivoId], references:[id])
-
-  activos       Activo[]
+  activos Activo[]
 }
 
 //////////////////////////////////////////////////////
@@ -185,50 +179,50 @@ model ModeloActivo {
 //////////////////////////////////////////////////////
 
 model Activo {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
 
-  id                Int      @id @default(autoincrement())
-  uuid              String   @unique @default(uuid())
+  codigoInterno String @unique
 
-  codigoInterno     String   @unique
+  codigoQR String @unique
 
-  codigoQR          String   @unique
+  nombre String
 
-  nombre            String
+  descripcion String?
 
-  descripcion       String?
+  numeroSerie String?
 
-  numeroSerie       String?
+  fechaAlta DateTime @default(now())
 
-  fechaAlta         DateTime @default(now())
+  fechaInstalacion DateTime?
 
-  fechaInstalacion  DateTime?
+  fechaBaja DateTime?
 
-  fechaBaja         DateTime?
+  activo Boolean @default(true)
 
-  activo            Boolean  @default(true)
+  modeloActivoId Int
+  modeloActivo   ModeloActivo @relation(fields: [modeloActivoId], references: [id])
 
-  modeloActivoId    Int
-  modeloActivo      ModeloActivo @relation(fields:[modeloActivoId], references:[id])
+  ubicacionId Int
+  ubicacion   Ubicacion @relation(fields: [ubicacionId], references: [id])
 
-  ubicacionId       Int
-  ubicacion         Ubicacion @relation(fields:[ubicacionId], references:[id])
+  estadoActivoId Int
+  estadoActivo   EstadoActivo @relation(fields: [estadoActivoId], references: [id])
 
-  estadoActivoId    Int
-  estadoActivo      EstadoActivo @relation(fields:[estadoActivoId], references:[id])
+  criticidadId Int
+  criticidad   Criticidad @relation(fields: [criticidadId], references: [id])
 
-  criticidadId      Int
-  criticidad        Criticidad @relation(fields:[criticidadId], references:[id])
+  padreId Int?
 
-  padreId           Int?
+  padre Activo? @relation("JerarquiaActivo", fields: [padreId], references: [id])
 
-  padre             Activo? @relation("JerarquiaActivo", fields:[padreId], references:[id])
+  hijos Activo[] @relation("JerarquiaActivo")
 
-  hijos             Activo[] @relation("JerarquiaActivo")
+  ordenes OrdenTrabajo[]
 
-  ordenes           OrdenTrabajo[]
-
-  creadoEn          DateTime @default(now())
-  actualizadoEn     DateTime @updatedAt
+  creadoEn      DateTime     @default(now())
+  actualizadoEn DateTime     @updatedAt
+  valorCampos   ValorCampo[]
 }
 
 //////////////////////////////////////////////////////
@@ -236,39 +230,37 @@ model Activo {
 //////////////////////////////////////////////////////
 
 model CampoPersonalizado {
+  id Int @id @default(autoincrement())
 
-  id            Int      @id @default(autoincrement())
+  nombre String
 
-  nombre        String
+  tipoDato String
 
-  tipoDato      String
+  unidad String?
 
-  unidad        String?
+  obligatorio Boolean @default(false)
 
-  obligatorio   Boolean @default(false)
+  orden Int @default(0)
 
-  orden         Int @default(0)
+  tipoActivoId Int
 
-  tipoActivoId  Int
+  tipoActivo TipoActivo @relation(fields: [tipoActivoId], references: [id])
 
-  tipoActivo    TipoActivo @relation(fields:[tipoActivoId], references:[id])
-
-  valores       ValorCampo[]
+  valores ValorCampo[]
 }
 
 model ValorCampo {
+  id Int @id @default(autoincrement())
 
-  id            Int @id @default(autoincrement())
+  valor String
 
-  valor         String
+  activoId Int
 
-  activoId      Int
+  activo Activo @relation(fields: [activoId], references: [id])
 
-  activo        Activo @relation(fields:[activoId], references:[id])
+  campoId Int
 
-  campoId       Int
-
-  campo         CampoPersonalizado @relation(fields:[campoId], references:[id])
+  campo CampoPersonalizado @relation(fields: [campoId], references: [id])
 }
 
 //////////////////////////////////////////////////////
@@ -276,26 +268,25 @@ model ValorCampo {
 //////////////////////////////////////////////////////
 
 model OrdenTrabajo {
+  id Int @id @default(autoincrement())
 
-  id              Int      @id @default(autoincrement())
+  numero String @unique
 
-  numero          String   @unique
+  titulo String
 
-  titulo          String
+  descripcion String
 
-  descripcion     String
+  prioridad String
 
-  prioridad       String
+  estado String
 
-  estado          String
+  fechaCreacion DateTime @default(now())
 
-  fechaCreacion   DateTime @default(now())
+  activoId Int
 
-  activoId        Int
+  activo Activo @relation(fields: [activoId], references: [id])
 
-  activo          Activo @relation(fields:[activoId], references:[id])
+  responsableId Int
 
-  responsableId   Int
-
-  responsable     Usuario @relation(fields:[responsableId], references:[id])
+  responsable Usuario @relation(fields: [responsableId], references: [id])
 }
