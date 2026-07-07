@@ -1,157 +1,128 @@
-# CMMS PURA - Registro de Congelamiento de Dominios
+# CMMS PURA
+# FREEZE DE ARQUITECTURA
 
-Este documento registra los dominios cuya arquitectura ha sido aprobada y congelada.
+Versión: 2.1
 
-Una vez que un dominio se encuentra en estado **CONGELADO**, cualquier modificación estructural deberá justificarse mediante una **ADR (Architecture Decision Record)** antes de implementarse.
-
----
-
-# Dominio 01 — Organización
-
-**Estado:** 🟢 CONGELADO
-
-**Versión:** 2.0
-
-**Fecha de aprobación:** 2026-06-30
+Última actualización: 2026-07-03
 
 ---
 
-# Dominio 02 — Seguridad
+# DOMINIOS CONGELADOS
 
-**Estado:** 🟢 CONGELADO
+## 01 - Organización
 
-**Versión:** 2.0
+Estado:
+CONGELADO
 
-**Fecha de aprobación:** 2026-06-30
+Incluye:
 
-## Documentación asociada
+- Empresa
+- TipoUnidadOrganizacional
+- UnidadOrganizacional
+- UnidadOrganizacionalClosure
 
-* `docs/dominios/02-seguridad.md`
+Patrones:
 
-## Entidades aprobadas
-
-* Usuario
-* Rol
-* Permiso
-* UsuarioRol
-* RolPermiso
-* Sesion
-* RefreshToken
-
-## Decisiones congeladas
-
-### Modelo de autorización
-
-```text
-Usuario
-    │
-    ▼
-UsuarioRol
-    │
-    ▼
-Rol
-    │
-    ▼
-RolPermiso
-    │
-    ▼
-Permiso
-```
-
-### Principios aprobados
-
-* Un usuario puede tener múltiples roles.
-* Un usuario debe tener al menos un rol activo.
-* Solo puede existir un rol principal por usuario.
-* Los permisos se asignan únicamente mediante roles.
-* Los permisos nunca se asignan directamente a usuarios.
-* El sistema queda preparado para múltiples sesiones y renovación de tokens.
-
-## Política de cambios
-
-Toda modificación futura deberá documentarse mediante una ADR antes de implementarse.
-
-
-## Documentación asociada
-
-* `docs/dominios/01-organizacion.md`
-* `docs/003-modelo-de-datos.md`
-* `docs/004-entidad-relacion.md`
-* `docs/006-diccionario-de-datos.md`
-
-## Entidades aprobadas
-
-* Empresa
-* Sitio
-* Planta
-* Departamento
-* Área
-* Ubicación
-* CalendarioLaboral
-* Turno
-
-## Decisiones congeladas
-
-### Organización administrativa
-
-```
-Empresa
-    ↓
-Sitio
-    ↓
-Planta
-```
-
-### Organización funcional
-
-Cada Planta podrá contener:
-
-* Departamentos
-* Áreas
-* Calendarios laborales
-* Ubicaciones
-
-### Organización física
-
-La estructura física será representada exclusivamente mediante la entidad `Ubicación`, utilizando una jerarquía ilimitada padre/hijo.
-
-Los Departamentos y las Áreas **no forman parte del árbol físico**.
-
-### Principios aprobados
-
-* Separación entre estructura organizacional y estructura física.
-* Escalabilidad para múltiples empresas, sitios y plantas.
-* Soporte para crecimiento sin cambios estructurales.
-* Uso de identificadores internos (`id`) y públicos (`uuid`).
-* Uso de códigos de negocio para la operación diaria.
-
-## Impacto
-
-Este dominio constituye la base sobre la que se implementarán los siguientes dominios:
-
-* Seguridad
-* Catálogo Técnico
-* Activos
-* Documentación
-* Personalización
-* Eventos
-* Mantenimiento
-* Inventario
-* Analítica
-
-## Política de cambios
-
-A partir de esta fecha:
-
-* No se modificará la estructura del dominio directamente.
-* Toda propuesta de cambio deberá registrarse mediante una ADR.
-* La documentación deberá actualizarse antes que la implementación.
-* El `schema_v2.prisma` deberá reflejar exactamente este dominio.
+- Árbol mediante Adjacency List + Closure Table
 
 ---
 
-## Historial
+## 02 - Seguridad
 
-| Versión | Fecha      | Estado    | Observaciones                                      |
-| ------- | ---------- | --------- | -------------------------------------------------- |
-| 2.0     | 2026-06-30 | CONGELADO | Primera versión aprobada del dominio Organización. |
+Estado:
+CONGELADO
+
+Incluye:
+
+- Usuario
+- Rol
+- Permiso
+- UsuarioRol
+- RolPermiso
+- SesionUsuario
+
+---
+
+## 03 - Catálogos
+
+Estado:
+CONGELADO
+
+Incluye:
+
+- Marca
+- Modelo
+
+Decisiones:
+
+- Los catálogos de negocio se incorporarán únicamente cuando un dominio los requiera.
+- Marca y Modelo constituyen el catálogo base de Activos.
+
+---
+
+## 04 - Catálogo Técnico
+
+Estado:
+ARQUITECTURA CONGELADA
+
+Implementación pendiente.
+
+Catálogos aprobados:
+
+- UnidadMedida
+- TipoArchivo
+
+No se crearán nuevos catálogos sin necesidad comprobada.
+
+---
+
+## 05 - Activos
+
+Estado:
+EN CONSTRUCCIÓN
+
+Congelado hasta el momento:
+
+- Activo
+- ActivoClosure
+- Patrón de jerarquía mediante Closure Table
+
+Pendiente:
+
+- PlantillaTecnica
+- TipoAtributo
+- ActivoTipoAtributo
+- ValorAtributoActivo
+
+---
+
+# PATRONES CONGELADOS
+
+000-base-entity.md
+
+001-entidad-catalogo.md
+
+002-prisma-style-guide.md
+
+003-catalog-pattern.md
+
+005-asset-pattern.md
+
+006-asset-template-pattern.md
+
+---
+
+# RFC APROBADAS
+
+RFC-005
+Refactor BaseEntity
+
+RFC-006
+Catálogos con código funcional
+
+RFC-007
+Dominio Activos
+
+---
+
+Toda modificación sobre un dominio congelado deberá realizarse mediante una RFC.

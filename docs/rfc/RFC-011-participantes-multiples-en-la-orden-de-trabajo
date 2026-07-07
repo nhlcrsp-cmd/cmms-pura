@@ -1,0 +1,44 @@
+Participantes múltiples en la Orden de Trabajo
+
+Estado
+
+BACKLOG
+
+Objetivo
+
+Reemplazar la relación:
+
+OrdenTrabajo
+
+↓
+
+responsableUsuarioId
+
+por:
+
+OrdenTrabajo
+
+↓
+
+OrdenTrabajoUsuario
+
+↓
+
+Usuario
+
+permitiendo múltiples participantes con distintos roles.
+
+Roles previstos:
+
+RESPONSABLE
+PLANIFICADOR
+SUPERVISOR
+EJECUTOR
+INSPECTOR
+APROBADOR
+Beneficios
+múltiples técnicos en una OT;
+múltiples supervisores;
+trazabilidad individual;
+registro de horas por persona;
+aprobación independiente.

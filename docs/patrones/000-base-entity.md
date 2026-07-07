@@ -277,7 +277,128 @@ Toda nueva entidad deberá:
 5. Favorecer la normalización del modelo.
 
 ---
+---
 
+# Reglas Arquitectónicas
+
+## RA-001
+
+Toda entidad persistente deberá utilizar el siguiente patrón de
+identificación:
+
+```prisma
+id BigInt @id @default(autoincrement())
+
+uuid String @unique @default(uuid())
+```
+
+---
+
+## RA-002
+
+Toda entidad persistente deberá incluir auditoría.
+
+```prisma
+creadoEn DateTime @default(now())
+
+actualizadoEn DateTime @updatedAt
+```
+
+Cuando corresponda:
+
+```prisma
+activo Boolean @default(true)
+
+eliminadoEn DateTime?
+```
+
+---
+
+## RA-003
+
+Los estados de una entidad nunca deberán representarse mediante
+múltiples campos booleanos.
+
+Incorrecto
+
+```prisma
+cerrada Boolean
+
+cancelada Boolean
+
+aprobada Boolean
+```
+
+Correcto
+
+```prisma
+estadoId BigInt
+```
+
+relacionado con
+
+```
+EstadoEntidad
+```
+
+---
+
+## RA-004
+
+Los catálogos internos pertenecientes a un dominio deberán
+permanecer dentro del propio dominio.
+
+Ejemplos
+
+EstadoOrdenTrabajo
+
+PrioridadOrdenTrabajo
+
+OrigenOrdenTrabajo
+
+No deberán ubicarse en el dominio de Catálogos
+generales.
+
+---
+
+## RA-005
+
+Los flujos de negocio deberán representarse mediante
+catálogos de estado.
+
+Cuando el proceso requiera mayor complejidad,
+la arquitectura podrá evolucionar hacia una
+Máquina de Estados (Workflow).
+
+No deberán utilizarse múltiples booleanos para
+simular estados mutuamente excluyentes.
+
+---
+
+## RA-006
+
+Las relaciones deberán representar responsabilidades.
+
+Las entidades definen "qué son".
+
+Las relaciones definen "cómo se utilizan".
+
+Ejemplo
+
+TipoAtributo
+
+↓
+
+PlantillaTecnicaAtributo
+
+↓
+
+PlantillaTecnica
+
+Esta separación evita duplicación de información
+y mejora la reutilización de modelos.
+
+---
 # Estado
 
 Este documento constituye el patrón arquitectónico base del CMMS.

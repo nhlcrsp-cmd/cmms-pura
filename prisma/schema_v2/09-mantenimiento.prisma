@@ -1,0 +1,950 @@
+// ======================================================
+// TIPO ORDEN DE TRABAJO
+// ======================================================
+
+model TipoOrdenTrabajo {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  BigInt   @id @default(autoincrement())
+
+  uuid                String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo              String   @unique
+
+  nombre              String
+
+  descripcion         String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre         String?
+
+  colorHex            String?
+
+  ordenVisual         Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean  @default(true)
+
+  eliminadoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime @default(now())
+
+  actualizadoEn       DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenesTrabajo      OrdenTrabajo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([nombre])
+
+  @@map("tipos_orden_trabajo")
+
+}
+// ======================================================
+// ESTADO ORDEN DE TRABAJO
+// ======================================================
+
+model EstadoOrdenTrabajo {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  BigInt   @id @default(autoincrement())
+
+  uuid                String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo              String   @unique
+
+  nombre              String
+
+  descripcion         String?
+
+  // ----------------------------------------------------
+  // Comportamiento
+  // ----------------------------------------------------
+
+  esInicial           Boolean  @default(false)
+
+  esFinal             Boolean  @default(false)
+
+  permiteEdicion      Boolean  @default(true)
+
+  requiereAprobacion  Boolean  @default(false)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre         String?
+
+  colorHex            String?
+
+  ordenVisual         Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean  @default(true)
+
+  eliminadoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime @default(now())
+
+  actualizadoEn       DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenesTrabajo      OrdenTrabajo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([esInicial])
+
+  @@index([esFinal])
+
+  @@map("estados_orden_trabajo")
+
+}
+// ======================================================
+// PRIORIDAD ORDEN DE TRABAJO
+// ======================================================
+
+model PrioridadOrdenTrabajo {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  BigInt   @id @default(autoincrement())
+
+  uuid                String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo              String   @unique
+
+  nombre              String
+
+  descripcion         String?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  nivel               Int
+
+  tiempoObjetivoHoras Int?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre         String?
+
+  colorHex            String?
+
+  ordenVisual         Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean  @default(true)
+
+  eliminadoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime @default(now())
+
+  actualizadoEn       DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenesTrabajo      OrdenTrabajo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  @@unique([nivel])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([nivel])
+
+  @@map("prioridades_orden_trabajo")
+
+}
+// ======================================================
+// ORIGEN ORDEN DE TRABAJO
+// ======================================================
+
+model OrigenOrdenTrabajo {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  BigInt   @id @default(autoincrement())
+
+  uuid                String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo              String   @unique
+
+  nombre              String
+
+  descripcion         String?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  generaAutomaticamente Boolean @default(false)
+
+  requiereSolicitud     Boolean @default(true)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre         String?
+
+  colorHex            String?
+
+  ordenVisual         Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean  @default(true)
+
+  eliminadoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime @default(now())
+
+  actualizadoEn       DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenesTrabajo      OrdenTrabajo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([generaAutomaticamente])
+
+  @@map("origenes_orden_trabajo")
+
+}
+// ======================================================
+// ORIGEN ORDEN DE TRABAJO
+// ======================================================
+
+model OrigenOrdenTrabajo {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  BigInt   @id @default(autoincrement())
+
+  uuid                String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo              String   @unique
+
+  nombre              String
+
+  descripcion         String?
+
+reportadoPorUsuarioId BigInt?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  generaAutomaticamente Boolean @default(false)
+
+  requiereSolicitud     Boolean @default(true)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre         String?
+
+  colorHex            String?
+
+  ordenVisual         Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean  @default(true)
+
+  eliminadoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime @default(now())
+
+  actualizadoEn       DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenesTrabajo      OrdenTrabajo[]
+  reportadoPor Usuario[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([generaAutomaticamente])
+
+  @@map("origenes_orden_trabajo")
+
+}
+// ======================================================
+// ESTADO SOLICITUD DE MANTENIMIENTO
+// ======================================================
+
+model EstadoSolicitudMantenimiento {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  BigInt   @id @default(autoincrement())
+
+  uuid                String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo              String   @unique
+
+  nombre              String
+
+  descripcion         String?
+
+  // ----------------------------------------------------
+  // Comportamiento
+  // ----------------------------------------------------
+
+  esInicial           Boolean  @default(false)
+
+  esFinal             Boolean  @default(false)
+
+  permiteEdicion      Boolean  @default(true)
+
+  generaOrdenTrabajo  Boolean  @default(false)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre         String?
+
+  colorHex            String?
+
+  ordenVisual         Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean  @default(true)
+
+  eliminadoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime @default(now())
+
+  actualizadoEn       DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  solicitudesMantenimiento SolicitudMantenimiento[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([esInicial])
+
+  @@index([esFinal])
+
+  @@index([generaOrdenTrabajo])
+
+  @@map("estados_solicitud_mantenimiento")
+
+}
+// ======================================================
+// SOLICITUD DE MANTENIMIENTO
+// ======================================================
+
+model SolicitudMantenimiento {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                            BigInt   @id @default(autoincrement())
+
+  uuid                          String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  activoId                      BigInt?
+
+  unidadOrganizacionalId        BigInt
+
+  prioridadOrdenTrabajoId       BigInt
+
+  origenOrdenTrabajoId          BigInt
+
+  estadoSolicitudMantenimientoId BigInt
+
+  reportadoPorUsuarioId         BigInt
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  numero                        String   @unique
+
+  titulo                        String
+
+  descripcion                   String?
+
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
+
+  fechaSolicitud                DateTime @default(now())
+
+  fechaNecesaria                DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                      DateTime @default(now())
+
+  actualizadoEn                 DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  activo Activo?
+    @relation(
+      fields: [activoId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  unidadOrganizacional UnidadOrganizacional
+    @relation(
+      fields: [unidadOrganizacionalId],
+      references: [id],
+      onDelete: Restrict
+    )
+  prioridad PrioridadOrdenTrabajo
+    @relation(
+      fields: [prioridadOrdenTrabajoId],
+      references: [id],
+      onDelete: Restrict
+    )
+  origen OrigenOrdenTrabajo
+    @relation(
+      fields: [origenOrdenTrabajoId],
+      references: [id],
+      onDelete: Restrict
+    )
+  estado EstadoSolicitudMantenimiento
+    @relation(
+      fields: [estadoSolicitudMantenimientoId],
+      references: [id],
+      onDelete: Restrict
+    )
+  reportadoPor Usuario
+    @relation(
+      fields: [reportadoPorUsuarioId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  ordenTrabajo OrdenTrabajo?
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([activoId])
+
+  @@index([unidadOrganizacionalId])
+
+  @@index([prioridadOrdenTrabajoId])
+
+  @@index([origenOrdenTrabajoId])
+
+  @@index([estadoSolicitudMantenimientoId])
+
+  @@index([reportadoPorUsuarioId])
+
+  @@index([fechaSolicitud])
+
+  @@map("solicitudes_mantenimiento")
+
+}
+// ======================================================
+// ORDEN DE TRABAJO
+// ======================================================
+
+model OrdenTrabajo {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                          BigInt   @id @default(autoincrement())
+
+  uuid                        String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  solicitudMantenimientoId    BigInt?
+
+  activoId                    BigInt
+
+  unidadOrganizacionalId       BigInt
+
+  tipoOrdenTrabajoId           BigInt
+
+  estadoOrdenTrabajoId         BigInt
+
+  prioridadOrdenTrabajoId      BigInt
+
+  responsableUsuarioId         BigInt
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  numero                      String   @unique
+
+  titulo                      String
+
+  descripcion                 String?
+
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
+
+  fechaCreacion               DateTime @default(now())
+
+  fechaProgramadaInicio       DateTime?
+
+  fechaProgramadaFin          DateTime?
+
+  fechaInicioReal             DateTime?
+
+  fechaFinReal                DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                    DateTime @default(now())
+
+  actualizadoEn               DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  solicitud SolicitudMantenimiento?
+    @relation(
+      fields: [solicitudMantenimientoId],
+      references: [id],
+      onDelete: SetNull
+    )
+
+  activo Activo
+    @relation(
+      fields: [activoId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  unidadOrganizacional UnidadOrganizacional
+    @relation(
+      fields: [unidadOrganizacionalId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  tipo TipoOrdenTrabajo
+    @relation(
+      fields: [tipoOrdenTrabajoId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  estado EstadoOrdenTrabajo
+    @relation(
+      fields: [estadoOrdenTrabajoId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  prioridad PrioridadOrdenTrabajo
+    @relation(
+      fields: [prioridadOrdenTrabajoId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  responsable Usuario
+    @relation(
+      fields: [responsableUsuarioId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  tareas OrdenTrabajoTarea[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([numero])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([activoId])
+
+  @@index([estadoOrdenTrabajoId])
+
+  @@index([tipoOrdenTrabajoId])
+
+  @@index([prioridadOrdenTrabajoId])
+
+  @@index([responsableUsuarioId])
+
+  @@index([fechaProgramadaInicio])
+
+  @@index([fechaInicioReal])
+
+  @@map("ordenes_trabajo")
+
+}
+// ======================================================
+// ORDEN DE TRABAJO - TAREA
+// ======================================================
+
+model OrdenTrabajoTarea {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                      BigInt   @id @default(autoincrement())
+
+  uuid                    String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  ordenTrabajoId          BigInt
+
+  responsableUsuarioId    BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  numero                  Int
+
+  titulo                  String
+
+  descripcion             String?
+
+  // ----------------------------------------------------
+  // Planificación
+  // ----------------------------------------------------
+
+  duracionEstimadaMinutos Int?
+
+  ordenEjecucion          Int?
+
+  esObligatoria           Boolean  @default(true)
+
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
+
+  fechaInicio             DateTime?
+
+  fechaFin                DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                DateTime @default(now())
+
+  actualizadoEn           DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenTrabajo OrdenTrabajo
+    @relation(
+      fields: [ordenTrabajoId],
+      references: [id],
+      onDelete: Cascade
+    )
+
+  responsable Usuario?
+    @relation(
+      fields: [responsableUsuarioId],
+      references: [id],
+      onDelete: SetNull
+    )
+
+  registrosTrabajo RegistroTrabajo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([ordenTrabajoId, numero])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([ordenTrabajoId])
+
+  @@index([responsableUsuarioId])
+
+  @@index([ordenEjecucion])
+
+  @@map("ordenes_trabajo_tareas")
+
+}
+// ======================================================
+// REGISTRO DE TRABAJO
+// ======================================================
+
+model RegistroTrabajo {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                          BigInt   @id @default(autoincrement())
+
+  uuid                        String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  ordenTrabajoTareaId         BigInt
+
+  usuarioId                   BigInt
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  titulo                      String?
+
+  descripcion                 String?
+
+  observaciones               String?
+
+  // ----------------------------------------------------
+  // Ejecución
+  // ----------------------------------------------------
+
+  fechaInicio                 DateTime?
+
+  fechaFin                    DateTime?
+
+  minutosTrabajados           Int?
+
+  // ----------------------------------------------------
+  // Resultado
+  // ----------------------------------------------------
+
+  trabajoCompletado           Boolean  @default(false)
+
+  requiereSeguimiento         Boolean  @default(false)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                    DateTime @default(now())
+
+  actualizadoEn               DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  tarea OrdenTrabajoTarea
+    @relation(
+      fields: [ordenTrabajoTareaId],
+      references: [id],
+      onDelete: Cascade
+    )
+
+  usuario Usuario
+    @relation(
+      fields: [usuarioId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([ordenTrabajoTareaId])
+
+  @@index([usuarioId])
+
+  @@index([fechaInicio])
+
+  @@map("registros_trabajo")
+
+}

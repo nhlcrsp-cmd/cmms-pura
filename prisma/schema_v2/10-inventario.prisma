@@ -1,0 +1,556 @@
+// ======================================================
+// TIPO ITEM INVENTARIO
+// ======================================================
+
+model TipoItemInventario {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                      BigInt   @id @default(autoincrement())
+
+  uuid                    String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo                  String   @unique
+
+  nombre                  String
+
+  descripcion             String?
+
+  // ----------------------------------------------------
+  // Comportamiento
+  // ----------------------------------------------------
+
+  controlaStock           Boolean  @default(true)
+
+  admiteStockNegativo     Boolean  @default(false)
+
+  requiereSerie           Boolean  @default(false)
+
+  requiereLote            Boolean  @default(false)
+
+  esConsumible            Boolean  @default(true)
+
+  esHerramienta           Boolean  @default(false)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre             String?
+
+  colorHex                String?
+
+  ordenVisual             Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo                  Boolean  @default(true)
+
+  eliminadoEn             DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                DateTime @default(now())
+
+  actualizadoEn           DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  itemsInventario         ItemInventario[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([controlaStock])
+
+  @@map("tipos_item_inventario")
+
+}
+// ======================================================
+// UNIDAD DE MEDIDA INVENTARIO
+// ======================================================
+
+model UnidadMedidaInventario {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                  BigInt   @id @default(autoincrement())
+
+  uuid                String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo              String   @unique
+
+  nombre              String
+
+  abreviatura         String
+
+  descripcion         String?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  permiteDecimales    Boolean  @default(true)
+
+  ordenVisual         Int?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre         String?
+
+  colorHex            String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo              Boolean  @default(true)
+
+  eliminadoEn         DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn            DateTime @default(now())
+
+  actualizadoEn       DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  itemsInventario     ItemInventario[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  @@unique([abreviatura])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@map("unidades_medida_inventario")
+
+}
+// ======================================================
+// ESTADO ITEM INVENTARIO
+// ======================================================
+
+model EstadoItemInventario {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                      BigInt   @id @default(autoincrement())
+
+  uuid                    String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo                  String   @unique
+
+  nombre                  String
+
+  descripcion             String?
+
+  // ----------------------------------------------------
+  // Comportamiento
+  // ----------------------------------------------------
+
+  disponibleParaUso       Boolean  @default(true)
+
+  permiteMovimiento       Boolean  @default(true)
+
+  esEstadoFinal           Boolean  @default(false)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre             String?
+
+  colorHex                String?
+
+  ordenVisual             Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo                  Boolean  @default(true)
+
+  eliminadoEn             DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                DateTime @default(now())
+
+  actualizadoEn           DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  itemsInventario         ItemInventario[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([codigo])
+
+  @@index([disponibleParaUso])
+
+  @@index([permiteMovimiento])
+
+  @@map("estados_item_inventario")
+
+}
+// ======================================================
+// ITEM INVENTARIO
+// ======================================================
+
+model ItemInventario {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                          BigInt   @id @default(autoincrement())
+
+  uuid                        String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  tipoItemInventarioId        BigInt
+
+  unidadMedidaInventarioId    BigInt
+
+  estadoItemInventarioId      BigInt
+
+  fabricanteId                BigInt?
+
+  marcaId                     BigInt?
+
+  modeloId                    BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo                      String   @unique
+
+  nombre                      String
+
+  descripcion                 String?
+
+  numeroParte                 String?
+
+  codigoBarras                String?
+
+  referenciaFabricante        String?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  stockMinimo                 Decimal? @db.Decimal(18,4)
+
+  stockMaximo                 Decimal? @db.Decimal(18,4)
+
+  puntoReposicion             Decimal? @db.Decimal(18,4)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre                 String?
+
+  colorHex                    String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo                      Boolean  @default(true)
+
+  eliminadoEn                 DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                    DateTime @default(now())
+
+  actualizadoEn               DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  tipo TipoItemInventario
+    @relation(
+      fields: [tipoItemInventarioId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  unidadMedida UnidadMedidaInventario
+    @relation(
+      fields: [unidadMedidaInventarioId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  estado EstadoItemInventario
+    @relation(
+      fields: [estadoItemInventarioId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  fabricante Fabricante?
+    @relation(
+      fields: [fabricanteId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  marca Marca?
+    @relation(
+      fields: [marcaId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  modelo Modelo?
+    @relation(
+      fields: [modeloId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  stock StockInventario?
+
+  movimientos MovimientoInventario[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([nombre, numeroParte])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([tipoItemInventarioId])
+
+  @@index([unidadMedidaInventarioId])
+
+  @@index([estadoItemInventarioId])
+
+  @@index([fabricanteId])
+
+  @@index([marcaId])
+
+  @@index([modeloId])
+
+  @@index([codigo])
+
+  @@index([numeroParte])
+
+  @@map("items_inventario")
+
+}
+// ======================================================
+// STOCK INVENTARIO
+// ======================================================
+
+model StockInventario {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                      BigInt   @id @default(autoincrement())
+
+  uuid                    String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  itemInventarioId        BigInt
+
+  // ----------------------------------------------------
+  // Existencias
+  // ----------------------------------------------------
+
+  cantidadDisponible      Decimal  @db.Decimal(18,4)
+
+  cantidadReservada       Decimal  @default(0) @db.Decimal(18,4)
+
+  cantidadComprometida    Decimal  @default(0) @db.Decimal(18,4)
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                DateTime @default(now())
+
+  actualizadoEn           DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  itemInventario ItemInventario
+    @relation(
+      fields: [itemInventarioId],
+      references: [id],
+      onDelete: Cascade
+    )
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  @@unique([itemInventarioId])
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([itemInventarioId])
+
+  @@index([cantidadDisponible])
+
+  @@map("stock_inventario")
+
+}
+// ======================================================
+// MOVIMIENTO INVENTARIO
+// ======================================================
+
+model MovimientoInventario {
+
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id                          BigInt   @id @default(autoincrement())
+
+  uuid                        String   @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  itemInventarioId            BigInt
+
+  // ----------------------------------------------------
+  // Origen del movimiento
+  // ----------------------------------------------------
+
+  origenTipo                  String
+
+  origenId                    BigInt?
+
+  // ----------------------------------------------------
+  // Movimiento
+  // ----------------------------------------------------
+
+  fechaMovimiento             DateTime @default(now())
+
+  cantidad                    Decimal  @db.Decimal(18,4)
+
+  saldoAnterior               Decimal  @db.Decimal(18,4)
+
+  saldoNuevo                  Decimal  @db.Decimal(18,4)
+
+  observaciones               String?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn                    DateTime @default(now())
+
+  actualizadoEn               DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  itemInventario ItemInventario
+    @relation(
+      fields: [itemInventarioId],
+      references: [id],
+      onDelete: Restrict
+    )
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  @@index([itemInventarioId])
+
+  @@index([fechaMovimiento])
+
+  @@index([origenTipo])
+
+  @@index([origenTipo, origenId])
+
+  @@map("movimientos_inventario")
+
+}
