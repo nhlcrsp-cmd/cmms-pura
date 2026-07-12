@@ -2,120 +2,127 @@
 02-seguridad.prisma // Release 2.1 // Estado: Revisión consolidada
 ////////////////////////////////////////////////////////////
 
-model Usuario { id BigInt @id @default(autoincrement()) uuid String
-@unique @default(uuid())
+model Usuario { 
+    id BigInt @id @default(autoincrement()) 
+    uuid String @unique @default(uuid())
+    personaId BigInt?
+    nombreUsuario String @unique 
+    email String @unique 
+    passwordHash String
+    requiereCambioClave Boolean @default(false) 
+    dobleFactorActivo Boolean @default(false)
+    intentosFallidos Int @default(0) 
+    ultimoAccesoEn DateTime? 
+    bloqueadoHasta DateTime?
+    activo Boolean @default(true) 
+    eliminadoEn DateTime?
+    creadoEn DateTime @default(now()) 
+    actualizadoEn DateTime @updatedAt
+    roles UsuarioRol[] 
+    sesiones SesionUsuario[]
+    @@map(“usuario”) 
+}
 
-personaId BigInt?
+model Rol { 
+    id BigInt @id @default(autoincrement()) 
+    uuid String @unique @default(uuid())
+    codigo String @unique 
+    nombre String 
+    descripcion String?
+    iconoNombre String? 
+    colorHex String? 
+    ordenVisual Int?
+    esSistema Boolean @default(false) 
+    editable Boolean @default(true)
+    activo Boolean @default(true) 
+    eliminadoEn DateTime?
+    creadoEn DateTime @default(now()) 
+    actualizadoEn DateTime @updatedAt
+    usuarios UsuarioRol[] 
+    permisos RolPermiso[]
+    
+    @@unique([nombre]) 
+    @@index([codigo]) 
+    @@index([nombre])
+    @@map(“rol”) 
+}
 
-nombreUsuario String @unique email String @unique passwordHash String
+model Permiso { 
+    id BigInt @id @default(autoincrement()) 
+    uuid String @unique @default(uuid())
+    codigo String @unique 
+    recurso String 
+    accion String 
+    nombre String
+    descripcion String?
+    esSistema Boolean @default(true) 
+    editable Boolean @default(false)
+    activo Boolean @default(true) 
+    eliminadoEn DateTime?
+    creadoEn DateTime @default(now()) 
+    actualizadoEn DateTime @updatedAt
+    roles RolPermiso[]
+    @@unique([recurso, accion]) 
+    @@index([codigo]) 
+    @@index([recurso])
+    @@index([accion])
+    @@map(“permiso”) 
+}
 
-requiereCambioClave Boolean @default(false) dobleFactorActivo Boolean
-@default(false)
+model UsuarioRol { 
+    id BigInt @id @default(autoincrement()) 
+    uuid  @unique @default(uuid())
+    usuarioId BigInt rolId BigInt 
+    unidadOrganizacionalId BigInt?
+    vigenteDesde DateTime @default(now()) 
+    vigenteHasta DateTime?
+    activo Boolean @default(true) 
+    eliminadoEn DateTime?
+    creadoEn DateTime @default(now()) 
+    actualizadoEn DateTime @updatedAt
+    usuario Usuario @relation(fields:[usuarioId], references:[id], onDelete: Cascade) 
+    rol Rol @relation(fields:[rolId], references:[id], onDelete: Restrict) 
+    unidadOrganizacional UnidadOrganizacional? @relation(fields:[unidadOrganizacionalId], references:[id], onDelete: Restrict)
+    @@unique([usuarioId, rolId, unidadOrganizacionalId])
+    @@index([usuarioId]) 
+    @@index([rolId]) 
+    @@index([unidadOrganizacionalId])
+    @@map(“usuario_rol”) 
+}
 
-intentosFallidos Int @default(0) ultimoAccesoEn DateTime? bloqueadoHasta
-DateTime?
+model RolPermiso { 
+    id BigInt @id @default(autoincrement()) 
+    uuid String @unique @default(uuid())
+    rolId BigInt 
+    permisoId BigInt
+    vigenteDesde DateTime @default(now()) 
+    vigenteHasta DateTime?
+    activo Boolean @default(true) 
+    eliminadoEn DateTime?
+    creadoEn DateTime @default(now()) 
+    actualizadoEn DateTime @updatedAt
+    rol Rol @relation(fields:[rolId], references:[id], onDelete: Cascade)
+    permiso Permiso @relation(fields:[permisoId], references:[id], onDelete: Restrict)
+    @@unique([rolId, permisoId]) 
+    @@index([rolId]) 
+    @@index([permisoId])
+    @@map(“rol_permiso”) }
 
-activo Boolean @default(true) eliminadoEn DateTime?
-
-creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
-
-roles UsuarioRol[] sesiones SesionUsuario[]
-
-@@map(“usuario”) }
-
-model Rol { id BigInt @id @default(autoincrement()) uuid String @unique
-@default(uuid())
-
-codigo String @unique nombre String descripcion String?
-
-iconoNombre String? colorHex String? ordenVisual Int?
-
-esSistema Boolean @default(false) editable Boolean @default(true)
-
-activo Boolean @default(true) eliminadoEn DateTime?
-
-creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
-
-usuarios UsuarioRol[] permisos RolPermiso[]
-
-@@unique([nombre]) @@index([codigo]) @@index([nombre])
-
-@@map(“rol”) }
-
-model Permiso { id BigInt @id @default(autoincrement()) uuid String
-@unique @default(uuid())
-
-codigo String @unique recurso String accion String nombre String
-descripcion String?
-
-esSistema Boolean @default(true) editable Boolean @default(false)
-
-activo Boolean @default(true) eliminadoEn DateTime?
-
-creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
-
-roles RolPermiso[]
-
-@@unique([recurso, accion]) @@index([codigo]) @@index([recurso])
-@@index([accion])
-
-@@map(“permiso”) }
-
-model UsuarioRol { id BigInt @id @default(autoincrement()) uuid String
-@unique @default(uuid())
-
-usuarioId BigInt rolId BigInt unidadOrganizacionalId BigInt?
-
-vigenteDesde DateTime @default(now()) vigenteHasta DateTime?
-
-activo Boolean @default(true) eliminadoEn DateTime?
-
-creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
-
-usuario Usuario @relation(fields:[usuarioId], references:[id], onDelete:
-Cascade) rol Rol @relation(fields:[rolId], references:[id], onDelete:
-Restrict) unidadOrganizacional UnidadOrganizacional?
-@relation(fields:[unidadOrganizacionalId], references:[id], onDelete:
-Restrict)
-
-@@unique([usuarioId, rolId, unidadOrganizacionalId])
-@@index([usuarioId]) @@index([rolId]) @@index([unidadOrganizacionalId])
-
-@@map(“usuario_rol”) }
-
-model RolPermiso { id BigInt @id @default(autoincrement()) uuid String
-@unique @default(uuid())
-
-rolId BigInt permisoId BigInt
-
-vigenteDesde DateTime @default(now()) vigenteHasta DateTime?
-
-activo Boolean @default(true) eliminadoEn DateTime?
-
-creadoEn DateTime @default(now()) actualizadoEn DateTime @updatedAt
-
-rol Rol @relation(fields:[rolId], references:[id], onDelete: Cascade)
-permiso Permiso @relation(fields:[permisoId], references:[id], onDelete:
-Restrict)
-
-@@unique([rolId, permisoId]) @@index([rolId]) @@index([permisoId])
-
-@@map(“rol_permiso”) }
-
-model SesionUsuario { id BigInt @id @default(autoincrement()) uuid
-String @unique @default(uuid())
-
-usuarioId BigInt
-
-tokenId String @unique direccionIp String? agenteUsuario String?
-dispositivo String? plataforma String?
-
-inicioSesionEn DateTime @default(now()) ultimoAccesoEn DateTime
-@default(now()) expiraEn DateTime? cierreSesionEn DateTime?
-
-usuario Usuario @relation(fields:[usuarioId], references:[id], onDelete:
-Cascade)
-
-@@index([usuarioId]) @@index([expiraEn])
-
-@@map(“sesion_usuario”) }
+model SesionUsuario { 
+    id BigInt @id @default(autoincrement()) 
+    uuid String @unique @default(uuid())
+    usuarioId BigInt
+    tokenId String @unique 
+    direccionIp String? 
+    agenteUsuario String?
+    dispositivo String? 
+    plataforma String?
+    inicioSesionEn DateTime @default(now()) 
+    ultimoAccesoEn DateTime @default(now()) 
+    expiraEn DateTime? 
+    cierreSesionEn DateTime?
+    usuario Usuario @relation(fields:[usuarioId], references:[id], onDelete: Cascade)
+    @@index([usuarioId]) 
+    @@index([expiraEn])
+    @@map(“sesion_usuario”) 
+}

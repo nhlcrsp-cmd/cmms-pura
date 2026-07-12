@@ -1,3 +1,23 @@
+// ======================================================
+// CMMS PURA
+// Schema v2.0
+// ======================================================
+//
+// Arquitectura:
+//
+// Organización
+// Seguridad
+// Catálogo Técnico
+// Activos
+// Documentación
+// Personalización
+// Eventos
+// Mantenimiento
+// Inventario
+// Analítica
+//
+// ======================================================
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,286 +27,577 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//////////////////////////////////////////////////////
-// SEGURIDAD
-//////////////////////////////////////////////////////
+// ====================================================== 
+// DOMINIO 01 - ORGANIZACIÓN 
+// Release 2.1 (BORRADOR ARQUITECTÓNICO) 
+//======================================================
 
-model Rol {
-  id   Int    @id @default(autoincrement())
+// ======================================================
+// EMPRESA
+// ======================================================
+
+model Empresa {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
   uuid String @unique @default(uuid())
 
-  nombre      String  @unique
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  razonSocial String
+
+  nombreComercial String?
+
+  identificacionFiscal String?
+
   descripcion String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
 
   activo Boolean @default(true)
 
-  creadoEn      DateTime @default(now())
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
   actualizadoEn DateTime @updatedAt
 
-  usuarios Usuario[]
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  unidadesOrganizacionales UnidadOrganizacional[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([razonSocial])
+  @@index([codigo])
+  @@index([razonSocial])
+  @@map("empresas")
+}
+
+// ======================================================
+// TIPO UNIDAD ORGANIZACIONAL
+// ======================================================
+
+model TipoUnidadOrganizacional {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  nombre String
+
+  descripcion String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Comportamiento
+  // ----------------------------------------------------
+
+  permitePadre Boolean @default(true)
+
+  permiteHijos Boolean @default(true)
+
+  admiteActivos Boolean @default(true)
+
+  admitePersonas Boolean @default(true)
+
+  admiteInventario Boolean @default(true)
+
+  admiteOrdenesTrabajo Boolean @default(true)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  unidadesOrganizacionales UnidadOrganizacional[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+  @@index([codigo])
+  @@index([nombre])
+  @@map("tipos_unidad_organizacional")
+}
+
+// ======================================================
+// UNIDAD ORGANIZACIONAL
+// ======================================================
+
+model UnidadOrganizacional {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  empresaId BigInt
+
+  tipoUnidadOrganizacionalId BigInt
+
+  padreId BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String
+
+  nombre String
+
+  descripcion String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  empresa Empresa @relation(fields: [empresaId], references: [id], onDelete: Restrict)
+
+  tipo TipoUnidadOrganizacional @relation(fields: [tipoUnidadOrganizacionalId], references: [id], onDelete: Restrict)
+
+  padre UnidadOrganizacional? @relation("UnidadPadre", fields: [padreId], references: [id], onDelete: Restrict)
+
+  hijos UnidadOrganizacional[] @relation("UnidadPadre")
+
+  closureComoAncestro UnidadOrganizacionalClosure[] @relation("ClosureAncestro")
+
+  closureComoDescendiente UnidadOrganizacionalClosure[] @relation("ClosureDescendiente")
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([empresaId, codigo])
+  @@unique([empresaId, padreId, nombre])
+  @@index([empresaId])
+  @@index([tipoUnidadOrganizacionalId])
+  @@index([padreId])
+  @@index([nombre])
+  @@index([empresaId, activo])
+  @@map("unidades_organizacionales")
+}
+
+// ======================================================
+// UNIDAD ORGANIZACIONAL CLOSURE
+// ======================================================
+
+model UnidadOrganizacionalClosure {
+  // ----------------------------------------------------
+  // Clave primaria compuesta
+  // ----------------------------------------------------
+
+  ancestroId BigInt
+
+  descendienteId BigInt
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  profundidad Int
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ancestro UnidadOrganizacional @relation("ClosureAncestro", fields: [ancestroId], references: [id], onDelete: Cascade)
+
+  descendiente UnidadOrganizacional @relation("ClosureDescendiente", fields: [descendienteId], references: [id], onDelete: Cascade)
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@id([ancestroId, descendienteId])
+  @@index([ancestroId])
+  @@index([descendienteId])
+  @@index([ancestroId, profundidad])
+  @@index([descendienteId, profundidad])
+  @@map("unidades_organizacionales_closure")
+}
+
+//////////////////////////////////////////////////////////// 
+//02-seguridad.prisma 
+// Release 2.1 
+// Estado: Revisión consolidada
+////////////////////////////////////////////////////////////
+
+model Rol {
+  id            BigInt       @id @default(autoincrement())
+  uuid          String       @unique @default(uuid())
+  codigo        String       @unique
+  nombre        String
+  descripcion   String?
+  iconoNombre   String?
+  colorHex      String?
+  ordenVisual   Int?
+  esSistema     Boolean      @default(false)
+  editable      Boolean      @default(true)
+  activo        Boolean      @default(true)
+  eliminadoEn   DateTime?
+  creadoEn      DateTime     @default(now())
+  actualizadoEn DateTime     @updatedAt
+  usuarios      UsuarioRol[]
+  permisos      RolPermiso[]
+
+  @@unique([nombre])
+  @@index([codigo])
+  @@index([nombre])
+  @@map("roles")
+}
+
+model Permiso {
+  id            BigInt       @id @default(autoincrement())
+  uuid          String       @unique @default(uuid())
+  codigo        String       @unique
+  recurso       String
+  accion        String
+  nombre        String
+  descripcion   String?
+  esSistema     Boolean      @default(true)
+  editable      Boolean      @default(false)
+  activo        Boolean      @default(true)
+  eliminadoEn   DateTime?
+  creadoEn      DateTime     @default(now())
+  actualizadoEn DateTime     @updatedAt
+  roles         RolPermiso[]
+
+  @@unique([recurso, accion])
+  @@index([codigo])
+  @@index([recurso])
+  @@index([accion])
+  @@index([nombre])
+  @@map("permisos")
 }
 
 model Usuario {
-  id   Int    @id @default(autoincrement())
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
   uuid String @unique @default(uuid())
 
-  nombre   String
+  // ----------------------------------------------------
+  // Información personal
+  // ----------------------------------------------------
+
+  nombre String
+
   apellido String
 
-  usuario  String  @unique
-  email    String? @unique
-  password String
+  nombreCompleto String?
+
+  email String @unique
+
+  telefono String?
+
+  legajo String?
+
+  // ----------------------------------------------------
+  // Autenticación
+  // ----------------------------------------------------
+
+  username String @unique
+
+  passwordHash String
+
+  debeCambiarPassword Boolean @default(false)
+
+  ultimoLogin DateTime?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
 
   activo Boolean @default(true)
 
-  ultimoAcceso DateTime?
+  bloqueado Boolean @default(false)
 
-  creadoEn      DateTime @default(now())
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
   actualizadoEn DateTime @updatedAt
 
-  rolId Int
-  rol   Rol @relation(fields: [rolId], references: [id])
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
 
-  ordenes OrdenTrabajo[]
+  roles UsuarioRol[]
+
+  sesiones SesionUsuario[]
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@index([username])
+  @@index([email])
+  @@index([apellido])
+  @@index([nombre])
+  @@index([activo])
+  @@map("usuarios")
 }
 
-//////////////////////////////////////////////////////
-// INFRAESTRUCTURA
-//////////////////////////////////////////////////////
+model UsuarioRol {
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
 
-model Planta {
-  id   Int    @id @default(autoincrement())
+  usuarioId BigInt
+
+  rolId BigInt
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  asignadoEn DateTime @default(now())
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  rol Rol @relation(fields: [rolId], references: [id], onDelete: Cascade)
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@id([usuarioId, rolId])
+  @@index([usuarioId])
+  @@index([rolId])
+  @@map("usuarios_roles")
+}
+
+model RolPermiso {
+  rolId BigInt
+
+  permisoId BigInt
+
+  rol Rol @relation(fields: [rolId], references: [id], onDelete: Cascade)
+
+  permiso Permiso @relation(fields: [permisoId], references: [id], onDelete: Cascade)
+
+  @@id([rolId, permisoId])
+  @@map("roles_permisos")
+}
+
+// ======================================================
+// SESIÓN USUARIO
+// ======================================================
+
+model SesionUsuario {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
   uuid String @unique @default(uuid())
 
-  codigo String @unique
-  nombre String
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
 
-  descripcion String?
+  usuarioId BigInt
 
-  activo Boolean @default(true)
+  // ----------------------------------------------------
+  // Seguridad
+  // ----------------------------------------------------
 
-  creadoEn      DateTime @default(now())
-  actualizadoEn DateTime @updatedAt
+  tokenHash String @unique
 
-  ubicaciones Ubicacion[]
-}
+  refreshTokenHash String?
 
-model Ubicacion {
-  id   Int    @id @default(autoincrement())
-  uuid String @unique @default(uuid())
+  // ----------------------------------------------------
+  // Información de la sesión
+  // ----------------------------------------------------
 
-  codigo String @unique
-  nombre String
+  ip String?
 
-  descripcion String?
+  userAgent String?
 
-  activo Boolean @default(true)
+  dispositivo String?
 
-  plantaId Int
-  planta   Planta @relation(fields: [plantaId], references: [id])
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
 
-  padreId Int?
+  iniciadaEn DateTime @default(now())
 
-  padre Ubicacion? @relation("JerarquiaUbicacion", fields: [padreId], references: [id])
+  expiraEn DateTime
 
-  hijos Ubicacion[] @relation("JerarquiaUbicacion")
+  cerradaEn DateTime?
 
-  activos Activo[]
+  ultimoAccesoEn DateTime?
 
-  creadoEn      DateTime @default(now())
-  actualizadoEn DateTime @updatedAt
-}
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
 
-//////////////////////////////////////////////////////
-// CATALOGOS
-//////////////////////////////////////////////////////
+  activa Boolean @default(true)
 
-model TipoActivo {
-  id   Int    @id @default(autoincrement())
-  uuid String @unique @default(uuid())
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
 
-  nombre      String  @unique
-  descripcion String?
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
-  icono String?
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
 
-  activo Boolean @default(true)
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
 
-  modelos             ModeloActivo[]
-  campoPersonalizados CampoPersonalizado[]
-}
-
-model EstadoActivo {
-  id   Int    @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  nombre String @unique
-
-  activo Boolean @default(true)
-
-  activos Activo[]
-}
-
-model Criticidad {
-  id   Int    @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  nombre String @unique
-
-  nivel Int
-
-  color String?
-
-  activos Activo[]
-}
-
-model Fabricante {
-  id   Int    @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  nombre String @unique
-
-  pais String?
-
-  sitioWeb String?
-
-  contacto String?
-
-  modelos ModeloActivo[]
-}
-
-model ModeloActivo {
-  id   Int    @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  codigo String @unique
-
-  nombre String
-
-  descripcion String?
-
-  fabricanteId Int
-  fabricante   Fabricante @relation(fields: [fabricanteId], references: [id])
-
-  tipoActivoId Int
-  tipoActivo   TipoActivo @relation(fields: [tipoActivoId], references: [id])
-
-  activos Activo[]
-}
-
-//////////////////////////////////////////////////////
-// ACTIVOS
-//////////////////////////////////////////////////////
-
-model Activo {
-  id   Int    @id @default(autoincrement())
-  uuid String @unique @default(uuid())
-
-  codigoInterno String @unique
-
-  codigoQR String @unique
-
-  nombre String
-
-  descripcion String?
-
-  numeroSerie String?
-
-  fechaAlta DateTime @default(now())
-
-  fechaInstalacion DateTime?
-
-  fechaBaja DateTime?
-
-  activo Boolean @default(true)
-
-  modeloActivoId Int
-  modeloActivo   ModeloActivo @relation(fields: [modeloActivoId], references: [id])
-
-  ubicacionId Int
-  ubicacion   Ubicacion @relation(fields: [ubicacionId], references: [id])
-
-  estadoActivoId Int
-  estadoActivo   EstadoActivo @relation(fields: [estadoActivoId], references: [id])
-
-  criticidadId Int
-  criticidad   Criticidad @relation(fields: [criticidadId], references: [id])
-
-  padreId Int?
-
-  padre Activo? @relation("JerarquiaActivo", fields: [padreId], references: [id])
-
-  hijos Activo[] @relation("JerarquiaActivo")
-
-  ordenes OrdenTrabajo[]
-
-  creadoEn      DateTime     @default(now())
-  actualizadoEn DateTime     @updatedAt
-  valorCampos   ValorCampo[]
-}
-
-//////////////////////////////////////////////////////
-// CAMPOS PERSONALIZADOS
-//////////////////////////////////////////////////////
-
-model CampoPersonalizado {
-  id Int @id @default(autoincrement())
-
-  nombre String
-
-  tipoDato String
-
-  unidad String?
-
-  obligatorio Boolean @default(false)
-
-  orden Int @default(0)
-
-  tipoActivoId Int
-
-  tipoActivo TipoActivo @relation(fields: [tipoActivoId], references: [id])
-
-  valores ValorCampo[]
-}
-
-model ValorCampo {
-  id Int @id @default(autoincrement())
-
-  valor String
-
-  activoId Int
-
-  activo Activo @relation(fields: [activoId], references: [id])
-
-  campoId Int
-
-  campo CampoPersonalizado @relation(fields: [campoId], references: [id])
-}
-
-//////////////////////////////////////////////////////
-// ORDENES
-//////////////////////////////////////////////////////
-
-model OrdenTrabajo {
-  id Int @id @default(autoincrement())
-
-  numero String @unique
-
-  titulo String
-
-  descripcion String
-
-  prioridad String
-
-  estado String
-
-  fechaCreacion DateTime @default(now())
-
-  activoId Int
-
-  activo Activo @relation(fields: [activoId], references: [id])
-
-  responsableId Int
-
-  responsable Usuario @relation(fields: [responsableId], references: [id])
+  @@index([usuarioId])
+  @@index([activa])
+  @@index([expiraEn])
+  @@map("sesiones_usuario")
 }
