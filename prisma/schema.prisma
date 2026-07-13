@@ -282,6 +282,7 @@ model UnidadOrganizacional {
   // ----------------------------------------------------
   // Base de datos
   // ----------------------------------------------------
+  activos Activo[]
 
   @@unique([empresaId, codigo])
   @@unique([empresaId, padreId, nombre])
@@ -347,22 +348,27 @@ model UnidadOrganizacionalClosure {
 ////////////////////////////////////////////////////////////
 
 model Rol {
-  id            BigInt       @id @default(autoincrement())
-  uuid          String       @unique @default(uuid())
-  codigo        String       @unique
-  nombre        String
-  descripcion   String?
-  iconoNombre   String?
-  colorHex      String?
-  ordenVisual   Int?
-  esSistema     Boolean      @default(false)
-  editable      Boolean      @default(true)
-  activo        Boolean      @default(true)
+  id   BigInt @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  codigo      String  @unique
+  nombre      String
+  descripcion String?
+
+  iconoNombre String?
+  colorHex    String?
+  ordenVisual Int?
+
+  esSistema Boolean @default(false)
+  editable  Boolean @default(true)
+
+  activo        Boolean   @default(true)
   eliminadoEn   DateTime?
-  creadoEn      DateTime     @default(now())
-  actualizadoEn DateTime     @updatedAt
-  usuarios      UsuarioRol[]
-  permisos      RolPermiso[]
+  creadoEn      DateTime  @default(now())
+  actualizadoEn DateTime  @updatedAt
+
+  usuarios UsuarioRol[]
+  permisos RolPermiso[]
 
   @@unique([nombre])
   @@index([codigo])
@@ -872,6 +878,7 @@ model UnidadMedida {
   // ----------------------------------------------------
   // Base de datos
   // ----------------------------------------------------
+  plantillaAtributos PlantillaAtributo[]
 
   @@unique([nombre])
   @@unique([simbolo])
@@ -1023,6 +1030,7 @@ model Modelo {
   // ----------------------------------------------------
   // Índices
   // ----------------------------------------------------
+  activos Activo[]
 
   @@unique([marcaId, codigo])
   @@unique([marcaId, nombre])
@@ -1031,4 +1039,595 @@ model Modelo {
   @@index([nombre])
   @@index([ordenVisual])
   @@map("modelos")
+}
+
+// ======================================================
+// 05-activos.prisma
+// ======================================================
+
+// ======================================================
+// TIPO ACTIVO
+// ======================================================
+
+model TipoActivo {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  nombre String
+
+  descripcion String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  permitePadre Boolean @default(true)
+
+  permiteHijos Boolean @default(true)
+
+  admiteAtributos Boolean @default(true)
+
+  admiteDocumentos Boolean @default(true)
+
+  admitePreventivos Boolean @default(true)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  plantillasTecnicas PlantillaTecnica[]
+
+  activos Activo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+  @@index([codigo])
+  @@index([nombre])
+  @@index([ordenVisual])
+  @@map("tipos_activo")
+}
+
+// ======================================================
+// TIPO ATRIBUTO
+// ======================================================
+
+model TipoAtributo {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  nombre String
+
+  descripcion String?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  tipoDato String
+
+  admiteUnidadMedida Boolean @default(false)
+
+  admiteLista Boolean @default(false)
+
+  admiteRango Boolean @default(false)
+
+  admiteExpresion Boolean @default(false)
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  plantillasAtributo PlantillaAtributo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+  @@index([codigo])
+  @@index([nombre])
+  @@index([tipoDato])
+  @@index([ordenVisual])
+  @@map("tipos_atributo")
+}
+
+// ======================================================
+// PLANTILLA TÉCNICA
+// ======================================================
+
+model PlantillaTecnica {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  tipoActivoId BigInt
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String
+
+  nombre String
+
+  descripcion String?
+
+  version Int @default(1)
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  esPlantillaBase Boolean @default(false)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  tipoActivo TipoActivo @relation(fields: [tipoActivoId], references: [id], onDelete: Restrict)
+
+  atributos PlantillaAtributo[]
+
+  activos Activo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([tipoActivoId, codigo])
+  @@unique([tipoActivoId, nombre, version])
+  @@index([tipoActivoId])
+  @@index([codigo])
+  @@index([nombre])
+  @@map("plantillas_tecnicas")
+}
+
+// ======================================================
+// PLANTILLA ATRIBUTO
+// ======================================================
+
+model PlantillaAtributo {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  plantillaTecnicaId BigInt
+
+  tipoAtributoId BigInt
+
+  unidadMedidaId BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String
+
+  nombre String
+
+  descripcion String?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  requerido Boolean @default(false)
+
+  editable Boolean @default(true)
+
+  visible Boolean @default(true)
+
+  permiteHistorico Boolean @default(false)
+
+  valorPorDefecto String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  plantillaTecnica PlantillaTecnica @relation(fields: [plantillaTecnicaId], references: [id], onDelete: Cascade)
+
+  tipoAtributo TipoAtributo @relation(fields: [tipoAtributoId], references: [id], onDelete: Restrict)
+
+  unidadMedida UnidadMedida? @relation(fields: [unidadMedidaId], references: [id], onDelete: Restrict)
+
+  atributos ActivoAtributo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([plantillaTecnicaId, codigo])
+  @@unique([plantillaTecnicaId, nombre])
+  @@index([plantillaTecnicaId])
+  @@index([tipoAtributoId])
+  @@index([unidadMedidaId])
+  @@index([ordenVisual])
+  @@map("plantillas_atributo")
+}
+
+// ======================================================
+// ACTIVO
+// ======================================================
+
+model Activo {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  unidadOrganizacionalId BigInt
+
+  tipoActivoId BigInt
+
+  plantillaTecnicaId BigInt?
+
+  modeloId BigInt?
+
+  padreId BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String
+
+  nombre String
+
+  descripcion String?
+
+  numeroSerie String?
+
+  codigoInventario String?
+
+  fechaFabricacion DateTime?
+
+  fechaInstalacion DateTime?
+
+  fechaPuestaMarcha DateTime?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  unidadOrganizacional UnidadOrganizacional @relation(fields: [unidadOrganizacionalId], references: [id], onDelete: Restrict)
+
+  tipoActivo TipoActivo @relation(fields: [tipoActivoId], references: [id], onDelete: Restrict)
+
+  plantillaTecnica PlantillaTecnica? @relation(fields: [plantillaTecnicaId], references: [id], onDelete: Restrict)
+
+  modelo Modelo? @relation(fields: [modeloId], references: [id], onDelete: Restrict)
+
+  padre Activo? @relation("ActivoPadre", fields: [padreId], references: [id], onDelete: Restrict)
+
+  hijos Activo[] @relation("ActivoPadre")
+
+  closureComoAncestro ActivoClosure[] @relation("ClosureAncestro")
+
+  closureComoDescendiente ActivoClosure[] @relation("ClosureDescendiente")
+
+  atributos ActivoAtributo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([unidadOrganizacionalId, codigo])
+  @@index([unidadOrganizacionalId])
+  @@index([tipoActivoId])
+  @@index([plantillaTecnicaId])
+  @@index([modeloId])
+  @@index([padreId])
+  @@index([nombre])
+  @@index([numeroSerie])
+  @@index([codigoInventario])
+  @@map("activos")
+}
+
+// ======================================================
+// ACTIVO CLOSURE
+// ======================================================
+
+model ActivoClosure {
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  ancestroId BigInt
+
+  descendienteId BigInt
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  profundidad Int
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ancestro Activo @relation("ClosureAncestro", fields: [ancestroId], references: [id], onDelete: Cascade)
+
+  descendiente Activo @relation("ClosureDescendiente", fields: [descendienteId], references: [id], onDelete: Cascade)
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@id([ancestroId, descendienteId])
+  @@index([ancestroId])
+  @@index([descendienteId])
+  @@index([ancestroId, profundidad])
+  @@index([descendienteId, profundidad])
+  @@map("activos_closure")
+}
+
+// ======================================================
+// ACTIVO ATRIBUTO
+// ======================================================
+
+model ActivoAtributo {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  activoId BigInt
+
+  plantillaAtributoId BigInt
+
+  // ----------------------------------------------------
+  // Valor
+  // ----------------------------------------------------
+
+  valor String?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  activo Activo @relation(fields: [activoId], references: [id], onDelete: Cascade)
+
+  plantillaAtributo PlantillaAtributo @relation(fields: [plantillaAtributoId], references: [id], onDelete: Restrict)
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([activoId, plantillaAtributoId])
+  @@index([activoId])
+  @@index([plantillaAtributoId])
+  @@map("activos_atributo")
 }
