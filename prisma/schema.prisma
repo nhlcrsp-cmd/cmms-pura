@@ -470,6 +470,11 @@ model Usuario {
   // ----------------------------------------------------
   // Base de datos
   // ----------------------------------------------------
+  solicitudMantenimientos SolicitudMantenimiento[]
+  ordenTrabajos           OrdenTrabajo[]
+  ottareas                OTTarea[]
+  otrecursos              OTRecurso[]
+  othistorials            OTHistorial[]
 
   @@index([username])
   @@index([email])
@@ -808,6 +813,7 @@ model Prioridad {
   // ----------------------------------------------------
   // Base de datos
   // ----------------------------------------------------
+  ordenTrabajos OrdenTrabajo[]
 
   @@unique([nombre])
   @@unique([nivel])
@@ -1511,6 +1517,8 @@ model Activo {
   // ----------------------------------------------------
   // Base de datos
   // ----------------------------------------------------
+  solicitudMantenimientos SolicitudMantenimiento[]
+  ordenTrabajos           OrdenTrabajo[]
 
   @@unique([unidadOrganizacionalId, codigo])
   @@index([unidadOrganizacionalId])
@@ -1630,4 +1638,604 @@ model ActivoAtributo {
   @@index([activoId])
   @@index([plantillaAtributoId])
   @@map("activos_atributo")
+}
+
+//------------------------------------------------------
+//09-Mantenimiento
+//------------------------------------------------------
+
+// ======================================================
+// ESTADO SOLICITUD MANTENIMIENTO
+// ======================================================
+
+model EstadoSolicitudMantenimiento {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  nombre String
+
+  descripcion String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  esInicial Boolean @default(false)
+
+  esFinal Boolean @default(false)
+
+  generaOrdenTrabajo Boolean @default(false)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  solicitudes SolicitudMantenimiento[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+  @@index([codigo])
+  @@index([nombre])
+  @@index([ordenVisual])
+  @@map("estados_solicitud_mantenimiento")
+}
+
+// ======================================================
+// SOLICITUD MANTENIMIENTO
+// ======================================================
+
+model SolicitudMantenimiento {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  activoId BigInt
+
+  estadoSolicitudId BigInt
+
+  solicitanteId BigInt
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  titulo String
+
+  descripcion String?
+
+  observaciones String?
+
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
+
+  fechaSolicitud DateTime @default(now())
+
+  fechaRevision DateTime?
+
+  fechaCierre DateTime?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  activoEquipo Activo @relation(fields: [activoId], references: [id], onDelete: Restrict)
+
+  estado EstadoSolicitudMantenimiento @relation(fields: [estadoSolicitudId], references: [id], onDelete: Restrict)
+
+  solicitante Usuario @relation(fields: [solicitanteId], references: [id], onDelete: Restrict)
+
+  ordenesTrabajo OrdenTrabajo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@index([activoId])
+  @@index([estadoSolicitudId])
+  @@index([solicitanteId])
+  @@index([fechaSolicitud])
+  @@map("solicitudes_mantenimiento")
+}
+
+// ======================================================
+// ESTADO ORDEN DE TRABAJO
+// ======================================================
+
+model EstadoOrdenTrabajo {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  nombre String
+
+  descripcion String?
+
+  // ----------------------------------------------------
+  // Presentación
+  // ----------------------------------------------------
+
+  iconoNombre String?
+
+  colorHex String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Configuración
+  // ----------------------------------------------------
+
+  esInicial Boolean @default(false)
+
+  esFinal Boolean @default(false)
+
+  permiteEditar Boolean @default(true)
+
+  requiereAprobacion Boolean @default(false)
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenesTrabajo OrdenTrabajo[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([nombre])
+  @@index([codigo])
+  @@index([nombre])
+  @@index([ordenVisual])
+  @@map("estados_orden_trabajo")
+}
+
+// ======================================================
+// ORDEN DE TRABAJO
+// ======================================================
+
+model OrdenTrabajo {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  activoId BigInt
+
+  solicitudMantenimientoId BigInt?
+
+  estadoOrdenTrabajoId BigInt
+
+  prioridadId BigInt?
+
+  responsableId BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  codigo String @unique
+
+  titulo String
+
+  descripcion String?
+
+  observaciones String?
+
+  // ----------------------------------------------------
+  // Fechas
+  // ----------------------------------------------------
+
+  fechaProgramadaInicio DateTime?
+
+  fechaProgramadaFin DateTime?
+
+  fechaRealInicio DateTime?
+
+  fechaRealFin DateTime?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  activoEquipo Activo @relation(fields: [activoId], references: [id], onDelete: Restrict)
+
+  solicitud SolicitudMantenimiento? @relation(fields: [solicitudMantenimientoId], references: [id], onDelete: SetNull)
+
+  estado EstadoOrdenTrabajo @relation(fields: [estadoOrdenTrabajoId], references: [id], onDelete: Restrict)
+
+  prioridad Prioridad? @relation(fields: [prioridadId], references: [id], onDelete: Restrict)
+
+  responsable Usuario? @relation(fields: [responsableId], references: [id], onDelete: SetNull)
+
+  tareas OTTarea[]
+
+  recursos OTRecurso[]
+
+  historial OTHistorial[]
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@index([activoId])
+  @@index([estadoOrdenTrabajoId])
+  @@index([prioridadId])
+  @@index([responsableId])
+  @@index([solicitudMantenimientoId])
+  @@index([fechaProgramadaInicio])
+  @@index([fechaRealInicio])
+  @@map("ordenes_trabajo")
+}
+
+// ======================================================
+// OT TAREA
+// ======================================================
+
+model OTTarea {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  ordenTrabajoId BigInt
+
+  responsableId BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  titulo String
+
+  descripcion String?
+
+  ordenVisual Int?
+
+  // ----------------------------------------------------
+  // Ejecución
+  // ----------------------------------------------------
+
+  completada Boolean @default(false)
+
+  fechaInicio DateTime?
+
+  fechaFin DateTime?
+
+  observaciones String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenTrabajo OrdenTrabajo @relation(fields: [ordenTrabajoId], references: [id], onDelete: Cascade)
+
+  responsable Usuario? @relation(fields: [responsableId], references: [id], onDelete: SetNull)
+
+  // ----------------------------------------------------
+  // Restricciones
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@unique([ordenTrabajoId, ordenVisual])
+  @@index([ordenTrabajoId])
+  @@index([responsableId])
+  @@index([completada])
+  @@index([ordenVisual])
+  @@map("ot_tareas")
+}
+
+// ======================================================
+// OT RECURSO
+// ======================================================
+
+model OTRecurso {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  ordenTrabajoId BigInt
+
+  itemInventarioId BigInt?
+
+  usuarioId BigInt?
+
+  // ----------------------------------------------------
+  // Información
+  // ----------------------------------------------------
+
+  descripcion String?
+
+  cantidad Decimal?
+
+  costoUnitario Decimal?
+
+  costoTotal Decimal?
+
+  observaciones String?
+
+  // ----------------------------------------------------
+  // Estado
+  // ----------------------------------------------------
+
+  activo Boolean @default(true)
+
+  eliminadoEn DateTime?
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenTrabajo OrdenTrabajo @relation(fields: [ordenTrabajoId], references: [id], onDelete: Cascade)
+
+  //se descomenta en 10-Mantenimiento
+  // itemInventario ItemInventario? @relation(fields: [itemInventarioId], references: [id], onDelete: Restrict)
+
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@index([ordenTrabajoId])
+  @@index([itemInventarioId])
+  @@index([usuarioId])
+  @@map("ot_recursos")
+}
+
+// ======================================================
+// OT HISTORIAL
+// ======================================================
+
+model OTHistorial {
+  // ----------------------------------------------------
+  // Identidad
+  // ----------------------------------------------------
+
+  id BigInt @id @default(autoincrement())
+
+  uuid String @unique @default(uuid())
+
+  // ----------------------------------------------------
+  // Relaciones (FK)
+  // ----------------------------------------------------
+
+  ordenTrabajoId BigInt
+
+  usuarioId BigInt?
+
+  // ----------------------------------------------------
+  // Evento
+  // ----------------------------------------------------
+
+  tipoEvento String
+
+  descripcion String?
+
+  datos Json?
+
+  // ----------------------------------------------------
+  // Fecha
+  // ----------------------------------------------------
+
+  fechaEvento DateTime @default(now())
+
+  // ----------------------------------------------------
+  // Auditoría
+  // ----------------------------------------------------
+
+  creadoEn DateTime @default(now())
+
+  actualizadoEn DateTime @updatedAt
+
+  // ----------------------------------------------------
+  // Relaciones
+  // ----------------------------------------------------
+
+  ordenTrabajo OrdenTrabajo @relation(fields: [ordenTrabajoId], references: [id], onDelete: Cascade)
+
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  // ----------------------------------------------------
+  // Índices
+  // ----------------------------------------------------
+
+  // ----------------------------------------------------
+  // Base de datos
+  // ----------------------------------------------------
+
+  @@index([ordenTrabajoId])
+  @@index([usuarioId])
+  @@index([tipoEvento])
+  @@index([fechaEvento])
+  @@map("ot_historial")
 }
